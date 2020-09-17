@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Quarkus - Status</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
+	<link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+	<div class="ui fixed inverted menu">
+		<a class="header item" href="https://github.com/quarkusio/quarkus/pulls">
+			<img class="logo" src="https://quarkus.io/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" alt="Quarkus logo" style="width:200px;">
+		</a>
+		<span class="header item">
+			Status
+		</span>
+		<span class="header item">
+			{#if status.failure}
+				<i class="red icon exclamation circle large"></i>
+			{#else}
+				<i class="green icon check circle large"></i>
+			{/if}
+		</span>
+	</div>
+	<div class="main-content">
+		<div class="ui main container">
+			{#for section in status.sections}
+			<table class="ui celled striped table">
+				<thead>
+					<tr>
+						<th class="fourteen wide">{section.name}</th>
+						<th class="two wide center aligned">
+							{#if section.failure}
+								<i class="red icon exclamation circle large"></i>
+							{#else}
+								<i class="green icon check circle large"></i>
+							{/if}
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#for line in section.lines}
+					<tr class="{line.failure ? 'negative' : 'positive'}">
+						<td>
+							<div>
+								<strong><a href="{line.url}" target="_blank">{line.name}</a></strong>
+							</div>
+							{#if line.failure && line.failureMessage}
+							<div class="ui piled segment failure-message">
+								{line.failureMessage.raw}
+							</div>
+							{/if}
+						</td>
+						<td class="center aligned">
+							{#if line.failure}
+								<i class="red icon exclamation circle large"></i>
+							{#else}
+								<i class="green icon check circle large"></i>
+							{/if}
+						</td>
+					</tr>
+					{/for}
+				</tbody>
+			</table>
+			{/for}
+		</div>
+	</div>
+
+	<!-- Javascripts -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous"></script>
+</body>
+</html>

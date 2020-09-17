@@ -1,0 +1,40 @@
+{
+  repository(owner: "{owner}", name: "{repo}") {
+    issues(first: 100, filterBy: \{ labels: ["triage/ci-platform"] \}) {
+      edges {
+        node {
+          id
+          number
+          title
+          url
+          body
+          state
+          closedAt
+          comments(last: 20) {
+            nodes {
+              id
+              bodyText
+              bodyHTML
+              author {
+                ... on User {
+                  login
+                  avatarUrl
+                  name
+                  url
+                }
+              }
+            }
+          }
+          author {
+            ... on User {
+              login
+              avatarUrl
+              name
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+}

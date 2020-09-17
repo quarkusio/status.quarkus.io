@@ -1,0 +1,35 @@
+package io.quarkus.status.github;
+
+import java.util.Objects;
+
+public class Comment {
+    public String id;
+    public String bodyText;
+    public String bodyHTML;
+    public User author;
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id='" + id + '\'' +
+                ", author='" + author + '\'' +
+                ", bodyText='" + bodyText + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Comment))
+            return false;
+        Comment other = (Comment) o;
+        return id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+}

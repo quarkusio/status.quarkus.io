@@ -1,0 +1,14 @@
+.ui.menu .item {
+	font-size: 20px;
+}
+
+.main-content {
+	margin-top: 7em;
+	margin-bottom: 7em;
+}
+
+.ui.piled.segment.failure-message {
+	margin: 1em 0;
+	margin-left: 4em;
+	margin-bottom: 0;
+}

@@ -1,0 +1,142 @@
+package io.quarkus.status.github;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+
+import io.quarkus.qute.TemplateInstance;
+import io.quarkus.qute.api.CheckedTemplate;
+import io.quarkus.status.graphql.GraphQLClient;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+
+@ApplicationScoped
+public class GitHubService {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+    @Inject
+    @RestClient
+    GraphQLClient graphQLClient;
+
+    private final String token;
+
+    @Inject
+    public GitHubService(
+            @ConfigProperty(name = "status.token") String token) {
+        this.token = "Bearer " + token;
+    }
+
+    public List<Issue> findIssuesById(String owner, String repository, List<Integer> issueNumbers) throws IOException {
+        if (issueNumbers.isEmpty()) {
+            return Collections.emptyList();
+        }
+        String query = Templates.findIssuesByIds(owner, repository, issueNumbers).render();
+
+        JsonObject response = graphQLClient.graphql(token, new JsonObject().put("query", query));
+
+        // Any errors?
+        handleErrors(response);
+
+        JsonObject issuesJson = response
+                .getJsonObject("data")
+                .getJsonObject("repository");
+
+        List<Issue> issues = new ArrayList<>();
+        for (Integer issueNumber : issueNumbers) {
+            JsonObject issueJson = issuesJson.getJsonObject("_" + issueNumber);
+            if (issueJson == null || issueJson.isEmpty()) {
+                continue;
+            }
+
+            issues.add(extractIssue(issueJson));
+        }
+
+        return issues;
+    }
+
+    public List<Issue> findIssuesByLabel(String owner, String repository, String label) throws IOException {
+        String query = Templates.findIssuesByLabel(owner, repository, label).render();
+
+        JsonObject response = graphQLClient.graphql(token, new JsonObject().put("query", query));
+
+        // Any errors?
+        handleErrors(response);
+
+        JsonArray edgesJson = response
+                .getJsonObject("data")
+                .getJsonObject("repository")
+                .getJsonObject("issues")
+                .getJsonArray("edges");
+
+        List<Issue> issues = new ArrayList<>();
+        for (Object edgeJson : edgesJson) {
+            JsonObject issueJson = ((JsonObject) edgeJson).getJsonObject("node");
+            issues.add(extractIssue(issueJson));
+        }
+
+        return issues;
+    }
+
+    private Issue extractIssue(JsonObject issueJson) {
+        Issue issue = new Issue();
+        issue.id = issueJson.getString("id");
+        issue.title = issueJson.getString("title");
+        issue.number = issueJson.getInteger("number");
+        issue.author = issueJson.getJsonObject("author").mapTo(User.class);
+        issue.body = issueJson.getString("body");
+        issue.closedAt = issueJson.getString("closedAt") != null
+                ? LocalDateTime.parse(issueJson.getString("closedAt"), DATE_TIME_FORMATTER)
+                : null;
+        issue.state = issueJson.getString("state");
+        issue.url = issueJson.getString("url");
+
+        JsonArray commentsJson = issueJson.getJsonObject("comments").getJsonArray("nodes");
+        List<Comment> comments = new ArrayList<>();
+        for (int j = 0; j < commentsJson.size(); j++) {
+            comments.add(commentsJson.getJsonObject(j).mapTo(Comment.class));
+        }
+        Collections.reverse(comments);
+        issue.lastComments = comments;
+        return issue;
+    }
+
+    private void handleErrors(JsonObject response) throws IOException {
+        JsonArray errors = response.getJsonArray("errors");
+        if (errors != null) {
+            // Checking if there are any errors different from NOT_FOUND
+            for (int k = 0; k < errors.size(); k++) {
+                JsonObject error = errors.getJsonObject(k);
+                if (!"NOT_FOUND".equals(error.getString("type"))) {
+                    throw new IOException(error.toString());
+                }
+            }
+        }
+    }
+
+    @CheckedTemplate
+    private static class Templates {
+
+        /**
+         * Returns the issues given their respective numbers
+         */
+        public static native TemplateInstance findIssuesByIds(String owner, String repo, Collection<Integer> issues);
+
+        /**
+         * Returns the issues given a label
+         */
+        public static native TemplateInstance findIssuesByLabel(String owner, String repo, String label);
+
+    }
+
+}
