@@ -2,7 +2,11 @@ package io.quarkus.status.github;
 
 import java.util.Objects;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class User {
+
     public String login;
     public String avatarUrl;
     public String name;

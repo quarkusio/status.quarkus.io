@@ -3,6 +3,9 @@ package io.quarkus.status.model;
 import java.util.Locale;
 import java.util.Objects;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class StatusLine implements Comparable<StatusLine> {
 
     public String name;

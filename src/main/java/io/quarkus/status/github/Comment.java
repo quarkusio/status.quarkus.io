@@ -2,7 +2,11 @@ package io.quarkus.status.github;
 
 import java.util.Objects;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class Comment {
+
     public String id;
     public String bodyText;
     public String bodyHTML;

@@ -3,6 +3,9 @@ package io.quarkus.status.model;
 import java.util.Objects;
 import java.util.TreeSet;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class StatusSection {
 
     public String name;
