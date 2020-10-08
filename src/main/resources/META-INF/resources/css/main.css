@@ -2,6 +2,10 @@
 	font-size: 20px;
 }
 
+.ui.menu .item a {
+	color: white;
+}
+
 .main-content {
 	margin-top: 7em;
 	margin-bottom: 7em;

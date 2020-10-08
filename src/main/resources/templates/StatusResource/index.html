@@ -15,13 +15,16 @@
 		<span class="header item">
 			Status
 		</span>
+		{#for section in status.sections}
 		<span class="header item">
-			{#if status.failure}
-				<i class="red icon exclamation circle large"></i>
+			<small><a href="#{section.key}">{section.value.name}</a></small>&nbsp;&nbsp;
+			{#if section.value.failure}
+				<i class="red icon exclamation circle"></i>
 			{#else}
-				<i class="green icon check circle large"></i>
+				<i class="green icon check circle"></i>
 			{/if}
 		</span>
+		{/for}
 	</div>
 	<div class="main-content">
 		<div class="ui main container">
@@ -32,12 +35,13 @@
 				</div>
 			</div>
 			{#for section in status.sections}
+			<a name="{section.key}"></a>
 			<table class="ui celled striped table">
 				<thead>
 					<tr>
-						<th class="fourteen wide">{section.name}</th>
+						<th class="fourteen wide">{section.value.name}</th>
 						<th class="two wide center aligned">
-							{#if section.failure}
+							{#if section.value.failure}
 								<i class="red icon exclamation circle large"></i>
 							{#else}
 								<i class="green icon check circle large"></i>
@@ -46,7 +50,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#for line in section.lines}
+					{#for line in section.value.lines}
 					<tr class="{line.failure ? 'negative' : 'positive'}">
 						<td>
 							<div>

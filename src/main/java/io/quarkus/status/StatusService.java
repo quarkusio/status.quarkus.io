@@ -50,7 +50,7 @@ public class StatusService {
             statusLine.order = i++;
             mainSection.lines.add(statusLine);
         }
-        status.sections.add(mainSection);
+        status.sections.put(Status.MAIN_ID, mainSection);
 
         StatusSection platformSection = new StatusSection();
         platformSection.name = "Platform";
@@ -58,7 +58,7 @@ public class StatusService {
             StatusLine statusLine = fromIssue(issue);
             platformSection.lines.add(statusLine);
         }
-        status.sections.add(platformSection);
+        status.sections.put(Status.PLATFORM_ID, platformSection);
 
         StatusSection quarkiverseSection = new StatusSection();
         quarkiverseSection.name = "Quarkiverse";
@@ -66,7 +66,7 @@ public class StatusService {
             StatusLine statusLine = fromIssue(issue);
             quarkiverseSection.lines.add(statusLine);
         }
-        status.sections.add(quarkiverseSection);
+        status.sections.put(Status.QUARKIVERSE_ID, quarkiverseSection);
 
         return status;
     }
