@@ -8,6 +8,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import io.quarkus.cache.CacheResult;
 import io.quarkus.status.github.GitHubService;
 import io.quarkus.status.github.Issue;
 import io.quarkus.status.model.Status;
@@ -31,8 +32,7 @@ public class StatusService {
     @Inject
     GitHubService gitHubService;
 
-    // For now, let's do without cache
-    //@CacheResult(cacheName = CacheNames.STATUS_CACHE_NAME)
+    @CacheResult(cacheName = CacheNames.STATUS_CACHE_NAME)
     public Status getStatus() throws IOException {
         Status status = new Status();
         status.updated = LocalDateTime.now();

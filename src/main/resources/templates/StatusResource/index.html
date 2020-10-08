@@ -25,6 +25,12 @@
 	</div>
 	<div class="main-content">
 		<div class="ui main container">
+			<div class="ui icon message">
+				<i class="small sync icon"></i>
+				<div class="content">
+					<p>Updated on {status.updated.formatDateTime}.</p>
+				</div>
+			</div>
 			{#for section in status.sections}
 			<table class="ui celled striped table">
 				<thead>
