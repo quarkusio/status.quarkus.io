@@ -1,6 +1,6 @@
 {
   repository(owner: "{owner}", name: "{repo}") {
-    issues(first: 100, filterBy: \{ labels: ["triage/ci-platform"] \}) {
+    issues(first: 100, filterBy: \{ labels: ["{label}"] \}) {
       edges {
         node {
           id

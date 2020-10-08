@@ -24,10 +24,14 @@ public class StatusService {
             12111,
             11515
     );
-    private static final String OWNER = "quarkusio";
+    private static final String QUARKUS_IO_ORG = "quarkusio";
     private static final String MAIN_REPOSITORY = "quarkus";
 
     private static final String PLATFORM_LABEL = "triage/ci-platform";
+
+    private static final String QUARKIVERSE_ORG = "quarkiverse";
+    private static final String QUARKIVERSE_REPOSITORY = "quarkiverse";
+    private static final String QUARKIVERSE_LABEL = "triage/ci-quarkiverse";
 
     @Inject
     GitHubService gitHubService;
@@ -40,7 +44,7 @@ public class StatusService {
         StatusSection mainSection = new StatusSection();
         mainSection.name = "Main Builds";
         int i = 0;
-        for (Issue issue : gitHubService.findIssuesById(OWNER, MAIN_REPOSITORY, MAIN_ISSUES)) {
+        for (Issue issue : gitHubService.findIssuesById(QUARKUS_IO_ORG, MAIN_REPOSITORY, MAIN_ISSUES)) {
             StatusLine statusLine = fromIssue(issue);
             // we want to respect the order
             statusLine.order = i++;
@@ -50,11 +54,19 @@ public class StatusService {
 
         StatusSection platformSection = new StatusSection();
         platformSection.name = "Platform";
-        for (Issue issue : gitHubService.findIssuesByLabel(OWNER, MAIN_REPOSITORY, PLATFORM_LABEL)) {
+        for (Issue issue : gitHubService.findIssuesByLabel(QUARKUS_IO_ORG, MAIN_REPOSITORY, PLATFORM_LABEL)) {
             StatusLine statusLine = fromIssue(issue);
             platformSection.lines.add(statusLine);
         }
         status.sections.add(platformSection);
+
+        StatusSection quarkiverseSection = new StatusSection();
+        quarkiverseSection.name = "Quarkiverse";
+        for (Issue issue : gitHubService.findIssuesByLabel(QUARKIVERSE_ORG, QUARKIVERSE_REPOSITORY, QUARKIVERSE_LABEL)) {
+            StatusLine statusLine = fromIssue(issue);
+            quarkiverseSection.lines.add(statusLine);
+        }
+        status.sections.add(quarkiverseSection);
 
         return status;
     }
