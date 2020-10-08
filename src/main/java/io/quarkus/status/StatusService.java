@@ -6,9 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import io.quarkus.cache.CacheResult;
+import io.quarkus.runtime.StartupEvent;
+import io.quarkus.scheduler.Scheduled;
 import io.quarkus.status.github.GitHubService;
 import io.quarkus.status.github.Issue;
 import io.quarkus.status.model.Status;
@@ -36,8 +38,22 @@ public class StatusService {
     @Inject
     GitHubService gitHubService;
 
-    @CacheResult(cacheName = CacheNames.STATUS_CACHE_NAME)
-    public Status getStatus() throws IOException {
+    private volatile Status status;
+
+    public void initialize(@Observes StartupEvent startupEvent) throws IOException {
+        status = buildStatus();
+    }
+
+    @Scheduled(every = "10m")
+    public void updateStatus() throws IOException {
+        status = buildStatus();
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    private Status buildStatus() throws IOException {
         Status status = new Status();
         status.updated = LocalDateTime.now();
 
