@@ -53,7 +53,7 @@ public class StatusLine implements Comparable<StatusLine> {
     @Override
     public int compareTo(StatusLine o) {
         if (order > -1 || o.order > -1) {
-            return order > o.order ? 1 : (order < o.order ? -1 : 0);
+            return Integer.compare(order, o.order);
         }
 
         return name.toLowerCase(Locale.ROOT).compareTo(o.name.toLowerCase(Locale.ROOT));
