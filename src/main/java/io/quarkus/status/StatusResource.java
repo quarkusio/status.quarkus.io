@@ -2,7 +2,8 @@ package io.quarkus.status;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.util.Date;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -14,6 +15,7 @@ import io.quarkus.qute.TemplateExtension;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.qute.api.CheckedTemplate;
 import io.quarkus.status.model.Status;
+import org.ocpsoft.prettytime.PrettyTime;
 
 @Path("/")
 public class StatusResource {
@@ -35,10 +37,9 @@ public class StatusResource {
     @TemplateExtension
     static class Extensions {
 
-        private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd 'at' HH:mm:ss");
-
         static String formatDateTime(LocalDateTime dateTime) {
-            return FORMATTER.format(dateTime);
+            PrettyTime p = new PrettyTime();
+            return p.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant()));
         }
     }
 }
