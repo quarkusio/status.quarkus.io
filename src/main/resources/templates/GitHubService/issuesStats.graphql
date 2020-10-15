@@ -1,0 +1,17 @@
+{
+  created:search(query: "repo:{repository} label:{label} is:issue created:{timeWindow}", type: ISSUE, first: 1) {
+    issueCount
+  }
+  createdAndStillOpen:search(query: "repo:{repository} label:{label} is:issue is:open created:{timeWindow}", type: ISSUE, first: 1) {
+    issueCount
+  }
+  createdAndClosedNow:search(query: "repo:{repository} label:{label} is:issue is:closed created:{timeWindow}", type: ISSUE, first: 1) {
+    issueCount
+  }
+  closed:search(query: "repo:{repository} label:{label} is:issue is:closed closed:{timeWindow}", type: ISSUE, first: 1) {
+    issueCount
+  }
+  createdAndClosed:search(query: "repo:{repository} label:{label} is:issue is:closed created:{timeWindow} closed:{timeWindow}", type: ISSUE, first: 1) {
+    issueCount
+  }
+}
