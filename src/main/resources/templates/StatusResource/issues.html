@@ -43,15 +43,15 @@
                 {/for}
                 ],
                 datasets: [{
-                    label: 'Closed Now',
-                    backgroundColor: "#0000FF",
+                    label: 'Closed',
+                    backgroundColor: "#00CC00",
                     data: [
                     {#for entry in stats.entries}
 						{entry.createdAndClosedNow},
 					{/for}
                     ]
                 }, {
-                    label: 'Open Now',
+                    label: 'Still open',
                     backgroundColor: "#FF0000",
                     data: [
                     {#for entry in stats.entries}
@@ -64,7 +64,7 @@
             options: {
                 title: {
                     display: true,
-                    text: 'Created during the month and Closed / Open Now'
+                    text: 'Issues created per month'
                 },
                 tooltips: {
                     mode: 'index',
@@ -94,30 +94,30 @@
                 {/for}
                 ],
 				datasets: [{
-					label: 'Created',
+					label: 'Opened during month',
 					fill: false,
-					backgroundColor: "#0000FF",
-					borderColor: "#0000FF",
+					backgroundColor: "#FF0000",
+					borderColor: "#FF0000",
 					data: [
                     {#for entry in stats.entries}
 						{entry.created},
 					{/for}
                     ]
 				}, {
-					label: 'Closed',
+					label: 'Closed during month',
 					fill: false,
-					backgroundColor: "#FF00FF",
-					borderColor: "#FF00FF",
+					backgroundColor: "#00CC00",
+					borderColor: "#00CC00",
 					data: [
                     {#for entry in stats.entries}
 						{entry.closed},
 					{/for}
                     ]
 				}, {
-					label: 'Created and Closed',
+					label: 'Both opened and closed during month',
 					fill: false,
-					backgroundColor: "#00FFFF",
-					borderColor: "#00FFFF",
+					backgroundColor: "#000080",
+					borderColor: "#000080",
 					data: [
                     {#for entry in stats.entries}
 						{entry.createdAndClosed},
@@ -129,7 +129,7 @@
 				responsive: true,
 				title: {
 					display: true,
-					text: 'Created / Closed / both Created and Closed during the month'
+					text: 'Activity per month'
 				},
 				tooltips: {
 					mode: 'index',
