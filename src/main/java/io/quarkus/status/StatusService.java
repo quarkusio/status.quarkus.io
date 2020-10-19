@@ -6,10 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import io.quarkus.runtime.StartupEvent;
 import io.quarkus.scheduler.Scheduled;
 import io.quarkus.status.github.GitHubService;
 import io.quarkus.status.github.Issue;
@@ -40,17 +38,22 @@ public class StatusService {
 
     private volatile Status status;
 
-    public void initialize(@Observes StartupEvent startupEvent) throws IOException {
-        status = buildStatus();
-    }
-
     @Scheduled(every = "10m")
     public void updateStatus() throws IOException {
         status = buildStatus();
     }
 
-    public Status getStatus() {
-        return status;
+    public Status getStatus() throws IOException {
+        Status localStatus = status;
+        if (localStatus == null) {
+            synchronized (this) {
+                localStatus = status;
+                if (localStatus == null) {
+                    status = localStatus = buildStatus();
+                }
+            }
+        }
+        return localStatus;
     }
 
     private Status buildStatus() throws IOException {
