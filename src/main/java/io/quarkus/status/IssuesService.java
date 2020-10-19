@@ -1,24 +1,25 @@
 package io.quarkus.status;
 
-import io.quarkus.runtime.StartupEvent;
-import io.quarkus.scheduler.Scheduled;
-import io.quarkus.status.github.GitHubService;
-import io.quarkus.status.model.StatsEntry;
-import io.quarkus.status.model.Stats;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import io.quarkus.scheduler.Scheduled;
+import io.quarkus.status.github.GitHubService;
+import io.quarkus.status.model.Stats;
+import io.quarkus.status.model.StatsEntry;
+
 @ApplicationScoped
 public class IssuesService {
 
     private static final String QUARKUS_REPOSITORY = "quarkusio/quarkus";
+    private static final String BUG_NAME = "Bugs";
     private static final String BUG_LABEL = "kind/bug";
+    private static final String ENHANCEMENT_NAME = "Enhancements";
     private static final String ENHANCEMENT_LABEL = "kind/enhancement";
     private static final LocalDate ISSUES_STATS_START = LocalDate.of(2019, 1, 1);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
@@ -29,29 +30,44 @@ public class IssuesService {
     private volatile Stats bugsStats;
     private volatile Stats enhancementsStats;
 
-    public void initialize(@Observes StartupEvent startupEvent) throws IOException {
-        bugsStats = buildBugsMonthlyStats(BUG_LABEL);
-        enhancementsStats = buildBugsMonthlyStats(ENHANCEMENT_LABEL);
-    }
-
-    @Scheduled(every = "30m")
+    @Scheduled(every = "6H")
     public void updateStatus() throws IOException {
-        bugsStats = buildBugsMonthlyStats(BUG_LABEL);
-        enhancementsStats = buildBugsMonthlyStats(ENHANCEMENT_LABEL);
+        bugsStats = buildBugsMonthlyStats(BUG_NAME, BUG_LABEL);
+        enhancementsStats = buildBugsMonthlyStats(ENHANCEMENT_NAME, ENHANCEMENT_LABEL);
     }
 
-    public Stats getBugsMonthlyStats() {
-        return bugsStats;
-    }
-    public Stats getEnhancementsMonthlyStats() {
-        return enhancementsStats;
+    public Stats getBugsMonthlyStats() throws IOException {
+        Stats localStats = bugsStats;
+        if (localStats == null) {
+            synchronized (this) {
+                localStats = bugsStats;
+                if (localStats == null) {
+                    bugsStats = localStats = buildBugsMonthlyStats(BUG_NAME, BUG_LABEL);
+                }
+            }
+        }
+        return localStats;
     }
 
-    private Stats buildBugsMonthlyStats(String label) throws IOException {
+    public Stats getEnhancementsMonthlyStats() throws IOException {
+        Stats localStats = enhancementsStats;
+        if (localStats == null) {
+            synchronized (this) {
+                localStats = enhancementsStats;
+                if (localStats == null) {
+                    enhancementsStats = localStats = buildBugsMonthlyStats(ENHANCEMENT_NAME, ENHANCEMENT_LABEL);
+                }
+            }
+        }
+        return localStats;
+    }
+
+    private Stats buildBugsMonthlyStats(String name, String label) throws IOException {
         Stats stats = new Stats();
+        stats.name = name;
+        stats.label = label;
         stats.updated = LocalDateTime.now();
         stats.repository = QUARKUS_REPOSITORY;
-        stats.label = label;
 
         LocalDate start = ISSUES_STATS_START;
         LocalDate stopTime = LocalDate.now().withDayOfMonth(2);
