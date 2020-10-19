@@ -11,6 +11,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import io.quarkus.status.model.StatsEntry;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -63,6 +64,24 @@ public class GitHubService {
         }
 
         return issues;
+    }
+
+    public StatsEntry issuesStats(String repository, String label, String timeWindow, String entryName) throws IOException {
+        String query = Templates.issuesStats(repository, label, timeWindow).render();
+        JsonObject response = graphQLClient.graphql(token, new JsonObject().put("query", query));
+        handleErrors(response);
+
+        JsonObject data = response.getJsonObject("data");
+
+        StatsEntry statsEntry = new StatsEntry();
+        statsEntry.entryName = entryName;
+        statsEntry.created = data.getJsonObject("created").getInteger("issueCount");
+        statsEntry.createdAndClosedNow = data.getJsonObject("createdAndClosedNow").getInteger("issueCount");
+        statsEntry.createdAndOpenNow = data.getJsonObject("createdAndStillOpen").getInteger("issueCount");
+        statsEntry.closed = data.getJsonObject("closed").getInteger("issueCount");
+        statsEntry.createdAndClosed = data.getJsonObject("createdAndClosed").getInteger("issueCount");
+
+        return statsEntry;
     }
 
     public List<Issue> findIssuesByLabel(String owner, String repository, String label) throws IOException {
@@ -137,6 +156,11 @@ public class GitHubService {
          */
         public static native TemplateInstance findIssuesByLabel(String owner, String repo, String label);
 
+
+        /**
+         * Returns the issue stats for given repository, label and time window
+         */
+        public static native TemplateInstance issuesStats(String repository, String label, String timeWindow);
     }
 
 }
