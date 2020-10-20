@@ -8,9 +8,11 @@ import java.util.List;
 
 @RegisterForReflection
 public class Stats {
+
+    public String name;
+    public String label;
     public LocalDateTime updated;
     public String repository;
-    public String label;
 
     public List<StatsEntry> entries = new LinkedList<>();
 
