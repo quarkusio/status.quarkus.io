@@ -18,9 +18,9 @@ public class IssuesService {
 
     private static final String QUARKUS_REPOSITORY = "quarkusio/quarkus";
     private static final String BUG_NAME = "Bugs";
-    private static final String BUG_LABEL = "kind/bug";
+    public static final String BUG_LABEL = "kind/bug";
     private static final String ENHANCEMENT_NAME = "Enhancements";
-    private static final String ENHANCEMENT_LABEL = "kind/enhancement";
+    public static final String ENHANCEMENT_LABEL = "kind/enhancement";
     private static final LocalDate ISSUES_STATS_START = LocalDate.of(2019, 1, 1);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 

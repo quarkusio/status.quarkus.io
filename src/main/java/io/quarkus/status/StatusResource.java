@@ -30,7 +30,7 @@ public class StatusResource {
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance index(Status status);
-        public static native TemplateInstance issues(Stats stats);
+        public static native TemplateInstance issues(Status status, Stats stats, boolean isBugs);
     }
 
     @GET
@@ -43,14 +43,14 @@ public class StatusResource {
     @Path("bugs")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance bugs() throws IOException {
-        return Templates.issues(issuesService.getBugsMonthlyStats());
+        return Templates.issues(statusService.getStatus(), issuesService.getBugsMonthlyStats(), true);
     }
 
     @GET
     @Path("enhancements")
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance features() throws IOException {
-        return Templates.issues(issuesService.getEnhancementsMonthlyStats());
+        return Templates.issues(statusService.getStatus(), issuesService.getEnhancementsMonthlyStats(), false);
     }
 
     @TemplateExtension

@@ -10,22 +10,25 @@
 </head>
 <body>
 	<div class="ui fixed inverted menu">
-		<a class="header item" href="https://quarkus.io">
+		<a class="header item" href="/">
 			<img class="logo" src="https://quarkus.io/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" alt="Quarkus logo" style="width:200px;">
 		</a>
-		<span class="header item">
+		<a class="header active item" href="/">
 			Status
-		</span>
+		</a>
 		{#for section in status.sections}
-		<span class="header item">
-			<small><a href="#{section.key}">{section.value.name}</a></small>&nbsp;&nbsp;
+		<a class="header item" href="#{section.key}">
+			<small>{section.value.name}</small>&nbsp;&nbsp;
 			{#if section.value.failure}
 				<i class="red icon exclamation circle"></i>
 			{#else}
 				<i class="green icon check circle"></i>
 			{/if}
-		</span>
+		</a>
 		{/for}
+		<a class="header item" href="/bugs/">
+			Issues Deep Dive
+		</a>
 	</div>
 	<div class="main-content">
 		<div class="ui main container">
