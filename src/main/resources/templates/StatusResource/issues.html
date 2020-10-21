@@ -80,6 +80,7 @@
 	
 				},
 				options: {
+					onClick: barChartClickEvent,
 					title: {
 						display: true,
 						text: '{stats.name} created per month'
@@ -103,6 +104,13 @@
 					}
 				}
 			};
+			function barChartClickEvent(event, array){
+				if(array[0]) {
+					// console.table(array);
+					// console.table(array[0]._model);
+					window.open("https://github.com/quarkusio/quarkus/issues?q=label:{stats.label}+is:issue+is:open+created:" + array[0]._model.label, '_blank');
+				}
+			}
 			var lineChartConfig = {
 				type: 'line',
 				data: {
