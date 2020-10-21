@@ -12,6 +12,7 @@ import io.quarkus.scheduler.Scheduled;
 import io.quarkus.status.github.GitHubService;
 import io.quarkus.status.model.Stats;
 import io.quarkus.status.model.StatsEntry;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class IssuesService {
@@ -21,11 +22,13 @@ public class IssuesService {
     public static final String BUG_LABEL = "kind/bug";
     private static final String ENHANCEMENT_NAME = "Enhancements";
     public static final String ENHANCEMENT_LABEL = "kind/enhancement";
-    private static final LocalDate ISSUES_STATS_START = LocalDate.of(2019, 1, 1);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
     @Inject
     GitHubService gitHubService;
+
+    @ConfigProperty(name = "status.issues.stats.start", defaultValue = "2019-01-01")
+    private LocalDate issuesStatsStart;
 
     private volatile Stats bugsStats;
     private volatile Stats enhancementsStats;
@@ -69,7 +72,7 @@ public class IssuesService {
         stats.updated = LocalDateTime.now();
         stats.repository = QUARKUS_REPOSITORY;
 
-        LocalDate start = ISSUES_STATS_START;
+        LocalDate start = issuesStatsStart;
         LocalDate stopTime = LocalDate.now().withDayOfMonth(2);
 
         while (start.isBefore(stopTime)) {
