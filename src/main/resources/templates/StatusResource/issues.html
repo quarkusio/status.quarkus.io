@@ -80,6 +80,7 @@
 	
 				},
 				options: {
+					onClick: barChartClickEvent,
 					title: {
 						display: true,
 						text: '{stats.name} created per month'
@@ -87,6 +88,16 @@
 					tooltips: {
 						mode: 'index',
 						intersect: false
+					},
+					legend: {
+						onHover: function(e) {
+							e.target.style.cursor = 'pointer';
+						}
+					},
+					hover: {
+						onHover: (event, chartElement) => {
+							event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+						}
 					},
 					responsive: true,
 					scales: {
@@ -103,6 +114,15 @@
 					}
 				}
 			};
+			function barChartClickEvent(event, array){
+				if(array[0]) {
+					// console.table(array);
+					// console.table(array[0]._model);
+					var activePoint = window.barChart.getElementAtEvent(event)[0];
+					var issuesState = activePoint._datasetIndex == 0 ? "closed" : "open"
+					window.open("https://github.com/quarkusio/quarkus/issues?q=label:{stats.label}+is:issue+is:" + issuesState + "+created:" + array[0]._model.label, '_blank');
+				}
+			}
 			var lineChartConfig = {
 				type: 'line',
 				data: {
@@ -153,6 +173,11 @@
 						mode: 'index',
 						intersect: false,
 					},
+					legend: {
+						onHover: function(e) {
+							e.target.style.cursor = 'pointer';
+						}
+					},
 					hover: {
 						mode: 'nearest',
 						intersect: true
@@ -174,10 +199,10 @@
 	
 			window.onload = function() {
 				var ctxStacked = document.getElementById('canvas-stacked').getContext('2d');
-				window.myBar = new Chart(ctxStacked, barChartConfig);
+				window.barChart = new Chart(ctxStacked, barChartConfig);
 	
 				var ctxLines = document.getElementById('canvas-lines').getContext('2d');
-				window.myLine = new Chart(ctxLines, lineChartConfig);
+				window.lineChart = new Chart(ctxLines, lineChartConfig);
 			};
 		</script>
 		</div>
