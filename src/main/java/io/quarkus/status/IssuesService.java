@@ -28,7 +28,7 @@ public class IssuesService {
     GitHubService gitHubService;
 
     @ConfigProperty(name = "status.issues.stats.start", defaultValue = "2019-01-01")
-    private LocalDate issuesStatsStart;
+    LocalDate issuesStatsStart;
 
     private volatile Stats bugsStats;
     private volatile Stats enhancementsStats;
