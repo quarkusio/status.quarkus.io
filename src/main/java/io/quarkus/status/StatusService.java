@@ -22,7 +22,8 @@ public class StatusService {
     private static final List<Integer> MAIN_ISSUES = Arrays.asList(
             6588,
             12111,
-            11515
+            11515,
+            13058
     );
     private static final String QUARKUS_IO_ORG = "quarkusio";
     private static final String MAIN_REPOSITORY = "quarkus";
