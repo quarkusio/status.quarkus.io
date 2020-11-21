@@ -35,8 +35,8 @@ public class IssuesService {
 
     @Scheduled(every = "6H")
     public void updateStatus() throws IOException {
-        bugsStats = buildBugsMonthlyStats(BUG_NAME, BUG_LABEL);
-        enhancementsStats = buildBugsMonthlyStats(ENHANCEMENT_NAME, ENHANCEMENT_LABEL);
+        bugsStats = buildIssuesMonthlyStats(BUG_NAME, BUG_LABEL);
+        enhancementsStats = buildIssuesMonthlyStats(ENHANCEMENT_NAME, ENHANCEMENT_LABEL);
     }
 
     public Stats getBugsMonthlyStats() throws IOException {
@@ -45,7 +45,7 @@ public class IssuesService {
             synchronized (this) {
                 localStats = bugsStats;
                 if (localStats == null) {
-                    bugsStats = localStats = buildBugsMonthlyStats(BUG_NAME, BUG_LABEL);
+                    bugsStats = localStats = buildIssuesMonthlyStats(BUG_NAME, BUG_LABEL);
                 }
             }
         }
@@ -58,14 +58,14 @@ public class IssuesService {
             synchronized (this) {
                 localStats = enhancementsStats;
                 if (localStats == null) {
-                    enhancementsStats = localStats = buildBugsMonthlyStats(ENHANCEMENT_NAME, ENHANCEMENT_LABEL);
+                    enhancementsStats = localStats = buildIssuesMonthlyStats(ENHANCEMENT_NAME, ENHANCEMENT_LABEL);
                 }
             }
         }
         return localStats;
     }
 
-    private Stats buildBugsMonthlyStats(String name, String label) throws IOException {
+    private Stats buildIssuesMonthlyStats(String name, String label) throws IOException {
         Stats stats = new Stats();
         stats.name = name;
         stats.label = label;
