@@ -11,6 +11,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import io.quarkus.status.model.Label;
 import io.quarkus.status.model.StatsEntry;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -82,6 +83,53 @@ public class GitHubService {
         statsEntry.createdAndClosed = data.getJsonObject("createdAndClosed").getInteger("issueCount");
 
         return statsEntry;
+    }
+
+    public List<Label> labelsStats(String owner, String repository, String mainLabel, boolean subsetOnly) throws IOException {
+        List<Label> labels = new ArrayList<>();
+        labels.add(new Label("Label", "Open", "Closed"));
+
+        String cursor = null;
+        if (subsetOnly) {
+            extractLabels(owner, repository, mainLabel, 10, cursor, labels);
+        } else {
+            do {
+                cursor = extractLabels(owner, repository, mainLabel, 100, cursor, labels);
+            } while (cursor != null);
+        }
+
+        return labels;
+    }
+
+    private String extractLabels(String owner, String repository, String mainLabel, int returnedElements, String cursor, List<Label> labels) throws IOException {
+        String query = Templates.labelsStats(owner, repository, mainLabel, returnedElements, cursor).render();
+        JsonObject response = graphQLClient.graphql(token, new JsonObject().put("query", query));
+        handleErrors(response);
+
+        JsonObject labelsJson = response
+                .getJsonObject("data")
+                .getJsonObject("organization")
+                .getJsonObject("repository")
+                .getJsonObject("labels");
+        JsonArray edgesJson = labelsJson
+                .getJsonArray("edges");
+        JsonObject pageInfoJson = labelsJson
+                .getJsonObject("pageInfo");
+
+        for (Object edgeJson : edgesJson) {
+            JsonObject issueJson = ((JsonObject) edgeJson).getJsonObject("node");
+            labels.add(new Label(
+                    issueJson.getString("name"),
+                    issueJson.getJsonObject("open").getInteger("totalCount").toString(),
+                    issueJson.getJsonObject("closed").getInteger("totalCount").toString()
+            ));
+        }
+
+        if (pageInfoJson.getBoolean("hasNextPage")) {
+            return pageInfoJson.getString("endCursor");
+        } else {
+            return null;
+        }
     }
 
     public List<Issue> findIssuesByLabel(String owner, String repository, String label) throws IOException {
@@ -161,6 +209,11 @@ public class GitHubService {
          * Returns the issue stats for given repository, label and time window
          */
         public static native TemplateInstance issuesStats(String repository, String label, String timeWindow);
+
+        /**
+         * Returns the labels stats for given repository and main label
+         */
+        public static native TemplateInstance labelsStats(String owner, String repo, String label, int count, String cursor);
     }
 
 }

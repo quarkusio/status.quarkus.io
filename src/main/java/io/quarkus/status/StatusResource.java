@@ -27,6 +27,9 @@ public class StatusResource {
     @Inject
     IssuesService issuesService;
 
+    @Inject
+    LabelsService labelsService;
+
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance index(Status status);
@@ -51,6 +54,24 @@ public class StatusResource {
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance features() throws IOException {
         return Templates.issues(statusService.getStatus(), issuesService.getEnhancementsMonthlyStats(), false);
+    }
+
+    @GET
+    @Path("labels/bugs")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String bugsLabels() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        labelsService.getBugsLabels().forEach( label -> sb.append(label).append("\n"));
+        return sb.toString();
+    }
+
+    @GET
+    @Path("labels/enhancements")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String enhancementsLabels() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        labelsService.getEnhancementsLabels().forEach( label -> sb.append(label).append("\n"));
+        return sb.toString();
     }
 
     @TemplateExtension
