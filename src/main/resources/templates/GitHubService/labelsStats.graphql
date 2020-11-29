@@ -1,0 +1,30 @@
+{
+  organization(login: "{owner}") {
+    repository(name: "{repo}") {
+      name
+      url
+      labels (first: {count}, {#if cursor}after: "{cursor}"{/if}) {
+        edges {
+          node {
+            name
+            open:issues(states: [OPEN], labels: ["{label}"]) {
+              totalCount
+            }
+            closed:issues(states: [CLOSED], labels: ["{label}"]) {
+              totalCount
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        totalCount
+      }
+    }
+  }
+  rateLimit {
+    cost
+    remaining
+  }
+}

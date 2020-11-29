@@ -5,8 +5,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Quarkus - {stats.name} Deep Dive</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.semanticui.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js"></script>
+	<script type="text/javascript" src="/js/csv_to_html_table.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
 	<link rel="stylesheet" href="/css/main.css" />
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.semanticui.min.css">
 	<link rel="shortcut icon" type="image/png" href="/favicon.ico" >
 </head>
 <body>
@@ -51,6 +57,8 @@
 			<div class="ui message">
 				<canvas id="canvas-lines"></canvas>
 			</div>
+
+			<div id='table-container'></div>
 		<script>
 			var barChartConfig = {
 				type: 'bar',
@@ -204,6 +212,21 @@
 				var ctxLines = document.getElementById('canvas-lines').getContext('2d');
 				window.lineChart = new Chart(ctxLines, lineChartConfig);
 			};
+
+			function format_link(link) {
+				if (link)
+					return "<a href='https://github.com/quarkusio/quarkus/issues?q=label:{stats.label}+label:\"" + link + "\"+is:issue+is:open' target='_blank'>" + link + "</a>";
+				else
+					return "";
+			}
+			CsvToHtmlTable.init({
+				csv_path: '/labels/{stats.name.toLowerCase}',
+				element: 'table-container',
+				allow_download: false,
+				csv_options: \{separator: ',', delimiter: '"'\},
+				datatables_options: \{"paging": false, "info": false, "order": [[ 1, 'desc' ], [ 2, 'desc' ]]\},
+				custom_formatting: [[0, format_link]]
+			});
 		</script>
 		</div>
 	</div>
