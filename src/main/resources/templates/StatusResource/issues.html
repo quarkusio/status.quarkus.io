@@ -1,43 +1,10 @@
-<!doctype html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Quarkus - {stats.name} Deep Dive</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.semanticui.min.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js"></script>
-	<script type="text/javascript" src="/js/csv_to_html_table.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
-	<link rel="stylesheet" href="/css/main.css" />
-	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.semanticui.min.css">
-	<link rel="shortcut icon" type="image/png" href="/favicon.ico" >
-</head>
-<body>
-	<div class="ui fixed inverted menu">
-		<a class="header item" href="/">
-			<img class="logo" src="https://quarkus.io/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" alt="Quarkus logo" style="width:200px;">
-		</a>
-		<a class="header item" href="/">
-			Status
-		</a>
-		{#for section in status.sections}
-		<a class="header item" href="/#{section.key}">
-			<small>{section.value.name}</small>&nbsp;&nbsp;
-			{#if section.value.failure}
-				<i class="red icon exclamation circle"></i>
-			{#else}
-				<i class="green icon check circle"></i>
-			{/if}
-		</a>
-		{/for}
-		<span class="header active item" href="/bugs/">
-			Issues Deep Dive
-		</span>
-	</div>
-	<div class="main-content">
+
+{#include StatusResource/base}
+	{#title}{stats.name} Deep Dive{/title}
+	{#styles}
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.semanticui.min.css">
+	{/styles}
+	{#body}
 		<div class="ui main container">
 			<div class="ui pointing menu">
 				<a class="{isBugs ? 'active' : ''} item" href="/bugs/">Bugs</a>
@@ -59,6 +26,14 @@
 			</div>
 
 			<div id='table-container'></div>
+		</div>
+	{/body}
+	{#scripts}
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.semanticui.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js"></script>
+		<script type="text/javascript" src="/js/csv_to_html_table.js"></script>
 		<script>
 			var barChartConfig = {
 				type: 'bar',
@@ -228,7 +203,5 @@
 				custom_formatting: [[0, format_link]]
 			});
 		</script>
-		</div>
-	</div>
-</body>
-</html>
+	{/scripts}
+{/include}
