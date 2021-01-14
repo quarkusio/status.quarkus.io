@@ -1,36 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Quarkus - Status</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
-	<link rel="stylesheet" href="/css/main.css" />
-	<link rel="shortcut icon" type="image/png" href="/favicon.ico" >
-</head>
-<body>
-	<div class="ui fixed inverted menu">
-		<a class="header item" href="/">
-			<img class="logo" src="https://quarkus.io/assets/images/quarkus_logo_horizontal_rgb_reverse.svg" alt="Quarkus logo" style="width:200px;">
-		</a>
-		<a class="header active item" href="/">
-			Status
-		</a>
-		{#for section in status.sections}
-		<a class="header item" href="#{section.key}">
-			<small>{section.value.name}</small>&nbsp;&nbsp;
-			{#if section.value.failure}
-				<i class="red icon exclamation circle"></i>
-			{#else}
-				<i class="green icon check circle"></i>
-			{/if}
-		</a>
-		{/for}
-		<a class="header item" href="/bugs/">
-			Issues Deep Dive
-		</a>
-	</div>
-	<div class="main-content">
+{#include StatusResource/base}
+	{#title}Status{/title}
+	{#body}
 		<div class="ui main container">
 			<div class="ui icon message">
 				<i class="small sync icon"></i>
@@ -79,9 +49,5 @@
 			</table>
 			{/for}
 		</div>
-	</div>
-
-	<!-- Javascripts -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous"></script>
-</body>
-</html>
+	{/body}
+{/include}
