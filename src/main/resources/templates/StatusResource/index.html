@@ -25,7 +25,7 @@
 				</thead>
 				<tbody>
 					{#for line in section.value.lines}
-					<tr class="{line.failure ? 'negative' : 'positive'}">
+					<tr class="{#if line.failure}negative{#else}positive{/if}">
 						<td>
 							<div>
 								<strong><a href="{line.url}" target="_blank">{line.name}</a></strong>
