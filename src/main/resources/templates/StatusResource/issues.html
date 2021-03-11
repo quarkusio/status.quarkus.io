@@ -10,14 +10,14 @@
 				<a class="{isBugs ? 'active' : ''} item" href="/bugs/">Bugs</a>
 				<a class="{isBugs ? '' : 'active'} item" href="/enhancements/">Enhancements</a>
 			</div>
-		
+
 			<div class="ui icon message">
 				<i class="small sync icon"></i>
 				<div class="content">
-					<p>Updated {stats.updated.formatDateTime} (refreshed every 6 hours).</p>
+					<p>Updated {inject:prettyTime.format(stats.updated)} (refreshed every 6 hours).</p>
 				</div>
 			</div>
-	
+
 			<div class="ui message">
 				<canvas id="canvas-stacked"></canvas>
 			</div>
@@ -60,7 +60,7 @@
 						{/for}
 						]
 					},]
-	
+
 				},
 				options: {
 					onClick: barChartClickEvent,
@@ -179,11 +179,11 @@
 					}
 				}
 			};
-	
+
 			window.onload = function() {
 				var ctxStacked = document.getElementById('canvas-stacked').getContext('2d');
 				window.barChart = new Chart(ctxStacked, barChartConfig);
-	
+
 				var ctxLines = document.getElementById('canvas-lines').getContext('2d');
 				window.lineChart = new Chart(ctxLines, lineChartConfig);
 			};
