@@ -1,0 +1,38 @@
+{#include StatusResource/base}
+
+{#body}
+<div class="ui main container">
+
+    <a href="/tests">&lt; List of tests</a>
+
+    <table class="ui table">
+        <thead>
+        <tr>
+            <th>Job name</th>
+            <th>Job name</th>
+            <th>Job URL</th>
+            <th>Date completed</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {#for testExecution in executions}
+        <tr class="{testExecution.successful ? 'success-row' : 'failure-row'}">
+            <td>{testExecution.successful ? 'SUCCESS' : 'FAILURE'}</td>
+            <td>{testExecution.job.name}</td>
+            <td>{testExecution.job.completedAt}</td>
+            <td>{testExecution.job.completedAt}</td>
+            <td><a href="{testExecution.job.url}{testExecution.id}?{testExecution.successful}">Go to Job on Github Actions</a></td>
+        </tr>
+        {/for}
+        </tbody>
+    </table>
+
+</div>
+{/body}
+
+{#scripts}
+{/scripts}
+
+{/include}
