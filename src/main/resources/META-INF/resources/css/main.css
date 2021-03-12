@@ -34,3 +34,14 @@
 .ui.icon.message > i.icon:not(.close) {
 	font-size: 1em;
 }
+
+.flaky-input {
+    margin: 2em
+}
+
+.flaky-results {
+    margin: 2em;
+    padding: 2em;
+    background-color: #fafafa;
+    box-shadow: 2px 2px 2px #909090
+}

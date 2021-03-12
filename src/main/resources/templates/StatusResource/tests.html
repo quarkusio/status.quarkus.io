@@ -1,0 +1,38 @@
+{#include StatusResource/base}
+
+{#body}
+<div class="ui main container">
+
+    <div class="flaky-input">
+        <label for="testName">Find test by fully qualified test class name:</label><input type="text" id="testName">
+        <button type="button" onclick="showTestStats()">Show test failures</button>
+    </div>
+
+    <div class="flaky-results">
+        <h4>Known tests</h4>
+        <ul>
+            {#for test in tests}
+                <li><a href="/testFailures?testName={test}">{test}</a></li>
+            {/for}
+        </ul>
+    </div>
+</div>
+{/body}
+
+{#scripts}
+<script>
+    var testNameInput = document.getElementById("testName");
+    testNameInput.onkeydown = e => \{if (e.key=="Enter")  showTestStats()\}
+
+    function showTestStats() {
+        console.log("in showTestStats");
+        var testName = document.getElementById("testName").value;
+        console.log("element: ", document.getElementById("testName"));
+        console.log("value: ", testName);
+        window.location.href = '/testFailures?test=' + testName;
+    }
+
+</script>
+{/scripts}
+
+{/include}

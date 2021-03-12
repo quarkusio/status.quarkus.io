@@ -1,0 +1,52 @@
+{#include StatusResource/base}
+
+{#body}
+<div class="ui main container">
+
+    <a href="/tests">&lt; List of tests</a>
+
+    <div class="flaky-input">
+        <label for="testName">Fully qualified test class name:</label><input type="text" id="testName">
+        <button type="button" onclick="showTestStats()">Show test failures</button>
+    </div>
+
+    <div class="flaky-results">
+            {#if testStats != null}
+            <h4>Test failures and errors for {testName}</h4>
+            <ul>
+                {#for invocation in testStats.invocations}
+                    {#when invocation.status}
+                        {#is in ERROR FAILURE}
+                            <li>{invocation.status} in
+                                <a href="{invocation.checkRun.githubActionsUrl}">check id: {invocation.checkRun.testRunId}
+                                    at {invocation.checkRun.time.format('yyyy/MM/dd HH:mm')}</a>
+                            </li>
+                    {/when}
+                {/for}
+            </ul>
+            {#else}
+            {#if testName != null}
+                <h4>No test failures for {testName} found. Make sure you are using fully qualified class name</h4>
+                {/if}
+             {/if}
+    </div>
+</div>
+{/body}
+
+{#scripts}
+<script>
+    var testNameInput = document.getElementById("testName");
+    testNameInput.onkeydown = e => \{if (e.key=="Enter")  showTestStats()\}
+
+    function showTestStats() {
+        console.log("in showTestStats");
+        var testName = document.getElementById("testName").value;
+        console.log("element: ", document.getElementById("testName"));
+        console.log("value: ", testName);
+        window.location.href = '/testFailures?testName=' + testName;
+    }
+
+</script>
+{/scripts}
+
+{/include}
