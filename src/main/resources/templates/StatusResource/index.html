@@ -5,7 +5,7 @@
 			<div class="ui icon message">
 				<i class="small sync icon"></i>
 				<div class="content">
-					<p>Updated {status.updated.formatDateTime} (refreshed every 10 minutes).</p>
+					<p>Updated {inject:prettyTime.format(status.updated)} (refreshed every 10 minutes).</p>
 				</div>
 			</div>
 			{#for section in status.sections}
