@@ -20,6 +20,7 @@ import io.quarkus.status.model.StatusSection;
 public class StatusService {
 
     private static final List<Integer> MAIN_ISSUES = Arrays.asList(
+            15867,
             6588,
             12111,
             11515,
