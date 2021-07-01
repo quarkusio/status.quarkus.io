@@ -11,14 +11,14 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import io.quarkus.status.model.Label;
-import io.quarkus.status.model.StatsEntry;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
-import io.quarkus.qute.api.CheckedTemplate;
 import io.quarkus.status.graphql.GraphQLClient;
+import io.quarkus.status.model.Label;
+import io.quarkus.status.model.StatsEntry;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
