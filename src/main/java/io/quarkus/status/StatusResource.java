@@ -8,8 +8,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
-import io.quarkus.qute.api.CheckedTemplate;
 import io.quarkus.status.model.Stats;
 import io.quarkus.status.model.Status;
 
