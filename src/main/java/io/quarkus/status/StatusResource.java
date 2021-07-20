@@ -1,7 +1,5 @@
 package io.quarkus.status;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -33,28 +31,28 @@ public class StatusResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance index() throws IOException {
+    public TemplateInstance index() throws Exception {
         return Templates.index(statusService.getStatus());
     }
 
     @GET
     @Path("bugs")
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance bugs() throws IOException {
+    public TemplateInstance bugs() throws Exception {
         return Templates.issues(statusService.getStatus(), issuesService.getBugsMonthlyStats(), true);
     }
 
     @GET
     @Path("enhancements")
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance features() throws IOException {
+    public TemplateInstance features() throws Exception {
         return Templates.issues(statusService.getStatus(), issuesService.getEnhancementsMonthlyStats(), false);
     }
 
     @GET
     @Path("labels/bugs")
     @Produces(MediaType.TEXT_PLAIN)
-    public String bugsLabels() throws IOException {
+    public String bugsLabels() throws Exception {
         StringBuilder sb = new StringBuilder();
         labelsService.getBugsLabels().forEach( label -> sb.append(label).append("\n"));
         return sb.toString();
@@ -63,7 +61,7 @@ public class StatusResource {
     @GET
     @Path("labels/enhancements")
     @Produces(MediaType.TEXT_PLAIN)
-    public String enhancementsLabels() throws IOException {
+    public String enhancementsLabels() throws Exception {
         StringBuilder sb = new StringBuilder();
         labelsService.getEnhancementsLabels().forEach( label -> sb.append(label).append("\n"));
         return sb.toString();

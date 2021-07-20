@@ -1,6 +1,5 @@
 package io.quarkus.status;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -44,11 +43,11 @@ public class StatusService {
     private volatile Status status;
 
     @Scheduled(every = "10m")
-    public void updateStatus() throws IOException {
+    public void updateStatus() throws Exception {
         status = buildStatus();
     }
 
-    public Status getStatus() throws IOException {
+    public Status getStatus() throws Exception {
         Status localStatus = status;
         if (localStatus == null) {
             synchronized (this) {
@@ -61,7 +60,7 @@ public class StatusService {
         return localStatus;
     }
 
-    private Status buildStatus() throws IOException {
+    private Status buildStatus() throws Exception {
         Status status = new Status();
         status.updated = LocalDateTime.now();
 

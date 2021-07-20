@@ -60,6 +60,10 @@
             <artifactId>quarkus-openshift</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-graphql-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.quarkiverse.prettytime</groupId>
             <artifactId>quarkus-prettytime</artifactId>
             <version>0.1.2</version>

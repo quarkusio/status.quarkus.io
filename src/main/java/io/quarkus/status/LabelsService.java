@@ -7,7 +7,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.List;
 
 @ApplicationScoped
@@ -28,12 +27,12 @@ public class LabelsService {
     private volatile List<Label> enhancementsLabels;
 
     @Scheduled(every = "6H")
-    public void updateStatus() throws IOException {
+    public void updateStatus() throws Exception {
         bugsLabels = buildLabelsStats(BUG_LABEL);
         enhancementsLabels = buildLabelsStats(ENHANCEMENT_LABEL);
     }
 
-    public List<Label> getBugsLabels() throws IOException {
+    public List<Label> getBugsLabels() throws Exception {
         List<Label> localLabels = bugsLabels;
         if (localLabels == null) {
             synchronized (this) {
@@ -46,7 +45,7 @@ public class LabelsService {
         return localLabels;
     }
 
-    public List<Label> getEnhancementsLabels() throws IOException {
+    public List<Label> getEnhancementsLabels() throws Exception {
         List<Label> localLabels = enhancementsLabels;
         if (localLabels == null) {
             synchronized (this) {
@@ -59,7 +58,7 @@ public class LabelsService {
         return localLabels;
     }
 
-    private List<Label> buildLabelsStats(String mainLabel) throws IOException {
+    private List<Label> buildLabelsStats(String mainLabel) throws Exception {
         return gitHubService.labelsStats(QUARKUS_IO_ORG, MAIN_REPOSITORY, mainLabel, subsetOnly);
     }
 

@@ -7,20 +7,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonString;
+import javax.json.JsonValue;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
+import io.smallrye.graphql.client.Error;
+import io.smallrye.graphql.client.GraphQLClient;
+import io.smallrye.graphql.client.Response;
+import io.smallrye.graphql.client.dynamic.api.DynamicGraphQLClient;
 
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
-import io.quarkus.status.graphql.GraphQLClient;
 import io.quarkus.status.model.Label;
 import io.quarkus.status.model.StatsEntry;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 
 @ApplicationScoped
 public class GitHubService {
@@ -28,30 +34,30 @@ public class GitHubService {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     @Inject
-    @RestClient
-    GraphQLClient graphQLClient;
+    @GraphQLClient("github")
+    DynamicGraphQLClient graphQLClient;
 
-    private final String token;
+    Jsonb jsonb;
 
     @Inject
-    public GitHubService(
-            @ConfigProperty(name = "status.token") String token) {
-        this.token = "Bearer " + token;
+    public GitHubService() {
+        jsonb = JsonbBuilder.create();
     }
 
-    public List<Issue> findIssuesById(String owner, String repository, List<Integer> issueNumbers) throws IOException {
+    public List<Issue> findIssuesById(String owner, String repository, List<Integer> issueNumbers) throws Exception {
         if (issueNumbers.isEmpty()) {
             return Collections.emptyList();
         }
+
         String query = Templates.findIssuesByIds(owner, repository, issueNumbers).render();
 
-        JsonObject response = graphQLClient.graphql(token, new JsonObject().put("query", query));
+        Response response = graphQLClient.executeSync(query);
 
         // Any errors?
         handleErrors(response);
 
         JsonObject issuesJson = response
-                .getJsonObject("data")
+                .getData()
                 .getJsonObject("repository");
 
         List<Issue> issues = new ArrayList<>();
@@ -67,25 +73,26 @@ public class GitHubService {
         return issues;
     }
 
-    public StatsEntry issuesStats(String repository, String label, String timeWindow, String entryName) throws IOException {
+    public StatsEntry issuesStats(String repository, String label, String timeWindow, String entryName) throws Exception {
         String query = Templates.issuesStats(repository, label, timeWindow).render();
-        JsonObject response = graphQLClient.graphql(token, new JsonObject().put("query", query));
+        Response response = graphQLClient.executeSync(query);
         handleErrors(response);
 
-        JsonObject data = response.getJsonObject("data");
+        JsonObject data = response.getData();
+
 
         StatsEntry statsEntry = new StatsEntry();
         statsEntry.entryName = entryName;
-        statsEntry.created = data.getJsonObject("created").getInteger("issueCount");
-        statsEntry.createdAndClosedNow = data.getJsonObject("createdAndClosedNow").getInteger("issueCount");
-        statsEntry.createdAndOpenNow = data.getJsonObject("createdAndStillOpen").getInteger("issueCount");
-        statsEntry.closed = data.getJsonObject("closed").getInteger("issueCount");
-        statsEntry.createdAndClosed = data.getJsonObject("createdAndClosed").getInteger("issueCount");
+        statsEntry.created = data.getJsonObject("created").getInt("issueCount");
+        statsEntry.createdAndClosedNow = data.getJsonObject("createdAndClosedNow").getInt("issueCount");
+        statsEntry.createdAndOpenNow = data.getJsonObject("createdAndStillOpen").getInt("issueCount");
+        statsEntry.closed = data.getJsonObject("closed").getInt("issueCount");
+        statsEntry.createdAndClosed = data.getJsonObject("createdAndClosed").getInt("issueCount");
 
         return statsEntry;
     }
 
-    public List<Label> labelsStats(String owner, String repository, String mainLabel, boolean subsetOnly) throws IOException {
+    public List<Label> labelsStats(String owner, String repository, String mainLabel, boolean subsetOnly) throws Exception {
         List<Label> labels = new ArrayList<>();
         labels.add(new Label("Label", "Open", "Closed"));
 
@@ -101,13 +108,13 @@ public class GitHubService {
         return labels;
     }
 
-    private String extractLabels(String owner, String repository, String mainLabel, int returnedElements, String cursor, List<Label> labels) throws IOException {
+    private String extractLabels(String owner, String repository, String mainLabel, int returnedElements, String cursor, List<Label> labels) throws Exception {
         String query = Templates.labelsStats(owner, repository, mainLabel, returnedElements, cursor).render();
-        JsonObject response = graphQLClient.graphql(token, new JsonObject().put("query", query));
+        Response response = graphQLClient.executeSync(query);
         handleErrors(response);
 
         JsonObject labelsJson = response
-                .getJsonObject("data")
+                .getData()
                 .getJsonObject("organization")
                 .getJsonObject("repository")
                 .getJsonObject("labels");
@@ -120,8 +127,8 @@ public class GitHubService {
             JsonObject issueJson = ((JsonObject) edgeJson).getJsonObject("node");
             labels.add(new Label(
                     issueJson.getString("name"),
-                    issueJson.getJsonObject("open").getInteger("totalCount").toString(),
-                    issueJson.getJsonObject("closed").getInteger("totalCount").toString()
+                    String.valueOf(issueJson.getJsonObject("open").getInt("totalCount")),
+                    String.valueOf(issueJson.getJsonObject("closed").getInt("totalCount"))
             ));
         }
 
@@ -132,16 +139,16 @@ public class GitHubService {
         }
     }
 
-    public List<Issue> findIssuesByLabel(String owner, String repository, String label) throws IOException {
+    public List<Issue> findIssuesByLabel(String owner, String repository, String label) throws Exception {
         String query = Templates.findIssuesByLabel(owner, repository, label).render();
 
-        JsonObject response = graphQLClient.graphql(token, new JsonObject().put("query", query));
+        Response response = graphQLClient.executeSync(query);
 
         // Any errors?
         handleErrors(response);
 
         JsonArray edgesJson = response
-                .getJsonObject("data")
+                .getData()
                 .getJsonObject("repository")
                 .getJsonObject("issues")
                 .getJsonArray("edges");
@@ -159,10 +166,10 @@ public class GitHubService {
         Issue issue = new Issue();
         issue.id = issueJson.getString("id");
         issue.title = issueJson.getString("title");
-        issue.number = issueJson.getInteger("number");
-        issue.author = issueJson.getJsonObject("author").mapTo(User.class);
+        issue.number = issueJson.getInt("number");
+        issue.author = jsonb.fromJson(issueJson.getJsonObject("author").toString(), User.class);
         issue.body = issueJson.getString("body");
-        issue.closedAt = issueJson.getString("closedAt") != null
+        issue.closedAt = issueJson.get("closedAt") != JsonValue.NULL
                 ? LocalDateTime.parse(issueJson.getString("closedAt"), DATE_TIME_FORMATTER)
                 : null;
         issue.state = issueJson.getString("state");
@@ -171,23 +178,27 @@ public class GitHubService {
         JsonArray commentsJson = issueJson.getJsonObject("comments").getJsonArray("nodes");
         List<Comment> comments = new ArrayList<>();
         for (int j = 0; j < commentsJson.size(); j++) {
-            comments.add(commentsJson.getJsonObject(j).mapTo(Comment.class));
+            comments.add(jsonb.fromJson(commentsJson.getJsonObject(j).toString(), Comment.class));
         }
         Collections.reverse(comments);
         issue.lastComments = comments;
         return issue;
     }
 
-    private void handleErrors(JsonObject response) throws IOException {
-        JsonArray errors = response.getJsonArray("errors");
+    private void handleErrors(Response response) throws IOException {
+        List<Error> errors = response.getErrors();
         if (errors != null) {
             // Checking if there are any errors different from NOT_FOUND
             for (int k = 0; k < errors.size(); k++) {
-                JsonObject error = errors.getJsonObject(k);
-                if (!"NOT_FOUND".equals(error.getString("type"))) {
+                Error error = errors.get(k);
+                JsonValue errorType = error.getOtherFields().getOrDefault("type", null);
+                if (errorType == null || !"NOT_FOUND".equals(((JsonString) errorType).getString())) {
                     throw new IOException(error.toString());
                 }
             }
+        }
+        if(response.getData() == null || response.getData().equals(JsonValue.NULL)) {
+            throw new RuntimeException("No data received in response. Is the auth token correct?");
         }
     }
 
