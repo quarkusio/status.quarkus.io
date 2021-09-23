@@ -1,0 +1,107 @@
+{#include StatusResource/base}
+
+{#body}
+<div class="ui main container">
+
+    <div class="ui fluid form">
+        <div class="field">
+            <div class="ui label">Filter tests by name:</div>
+            <input type="text" class="ui input" id="testQuery" placeholder="test name substring">
+        </div>
+        <button type="button" class="ui button secondary" onclick="showTestStats()">Show tests</button>
+        <div id="error-div" class="ui negative message" style="visibility: hidden">
+            <i class="close icon"></i>
+            <div id="error-message" class="header">
+
+            </div>
+        </div>
+    </div>
+
+    <table class="ui striped table">
+        <thead>
+        <tr>
+            <th>Test name</th>
+            <th>Failure count</th>
+            <th>Failure ratio (in at most 40 last runs)</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="test-results">
+
+        </tbody>
+    </table>
+</div>
+{/body}
+
+{#scripts}
+<script>
+    const TEST_QUERY = 'testQuery';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const testQuery = urlParams.get(TEST_QUERY);
+
+    const testList = document.getElementById("test-results");
+    const testNameInput = document.getElementById("testQuery");
+    testNameInput.onkeydown = e => \{
+        if (e.key == "Enter") {
+            showTestStats()
+        }
+    }
+
+    if (testQuery) {
+        testNameInput.value = testQuery;
+    }
+
+    showTestStats();
+
+    function fillTestTable(data) {
+        if (!data) {
+            return;
+        }
+        testList.innerHTML = '';
+
+        data.reverse().forEach(row => {
+            const newRow = testList.insertRow(0);
+            newRow.insertCell(0).innerText = row.name;
+            newRow.insertCell(1).innerText = '' + (row.executionCount - row.successCount) + ' out of ' + row.executionCount;
+            newRow.insertCell(2).innerText = Math.floor(row.failureRatio * 100) + " %";
+            newRow.insertCell(3).innerHTML = `<a href="/test-details/$\{row.name}" class="ui button">Details</a>`
+        })
+    }
+
+    function showTestStats() {
+        document.getElementById("error-div").style.visibility = "hidden";
+        console.log("in showTestStats");
+        let testName = testNameInput.value;
+        console.log("element: ", testNameInput);
+        console.log("value: ", testName);
+
+        if (!testName) {
+            testName = '';
+        }
+        const url = new URL(location.href);
+        url.searchParams.set(TEST_QUERY, testName);
+        history.pushState(null, '', url.toString());
+
+        fetch(`/test-statistics?testQuery=$\{testNameInput.value}`)
+            .then(response => {
+                console.log(response);
+                if (response.status > 300) {
+                    response.text().then(
+                        result => {
+                            document.getElementById("error-message").innerText = result;
+                            document.getElementById("error-div").style.visibility = "visible";
+                            console.log("result '" + result + "'");
+                        }
+                    )
+                } else {
+                    return response.text()
+                        .then(result => fillTestTable(JSON.parse(result)));
+                }
+            });
+    }
+
+</script>
+{/scripts}
+
+{/include}

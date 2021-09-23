@@ -18,6 +18,16 @@ STATUS_TOKEN=<TOKEN>
 
 The token only needs read access to the repository.
 
+A lot of API calls are made to gather flaky tests statistics. If you would like to
+use a different API token for it, you can add it to the .env file:
+```
+FLAKY_TESTS_TOKEN=<ANOTHER_TOKEN>
+```
+
+If not provided, the `STATUS_TOKEN` will be used.
+
+**NOTE** in dev mode, gathering flaky tests is mocked.
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:

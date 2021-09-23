@@ -34,3 +34,18 @@
 .ui.icon.message > i.icon:not(.close) {
 	font-size: 1em;
 }
+
+.flaky-results {
+    margin: 2em;
+    padding: 2em;
+    background-color: #fafafa;
+    box-shadow: 2px 2px 2px #909090
+}
+
+.success-row {
+	background-color: #f0fff0;
+}
+.failure-row {
+	background-color: #ffe0e0;
+}
+
