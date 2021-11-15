@@ -1,6 +1,5 @@
 package io.quarkus.status;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,12 +33,12 @@ public class IssuesService {
     private volatile Stats enhancementsStats;
 
     @Scheduled(every = "6H")
-    public void updateStatus() throws IOException {
+    public void updateStatus() throws Exception {
         bugsStats = buildIssuesMonthlyStats(BUG_NAME, BUG_LABEL);
         enhancementsStats = buildIssuesMonthlyStats(ENHANCEMENT_NAME, ENHANCEMENT_LABEL);
     }
 
-    public Stats getBugsMonthlyStats() throws IOException {
+    public Stats getBugsMonthlyStats() throws Exception {
         Stats localStats = bugsStats;
         if (localStats == null) {
             synchronized (this) {
@@ -52,7 +51,7 @@ public class IssuesService {
         return localStats;
     }
 
-    public Stats getEnhancementsMonthlyStats() throws IOException {
+    public Stats getEnhancementsMonthlyStats() throws Exception {
         Stats localStats = enhancementsStats;
         if (localStats == null) {
             synchronized (this) {
@@ -65,7 +64,7 @@ public class IssuesService {
         return localStats;
     }
 
-    private Stats buildIssuesMonthlyStats(String name, String label) throws IOException {
+    private Stats buildIssuesMonthlyStats(String name, String label) throws Exception {
         Stats stats = new Stats();
         stats.name = name;
         stats.label = label;
