@@ -29,7 +29,7 @@
 		</div>
 	{/body}
 	{#scripts}
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.semanticui.min.js"></script>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js"></script>
@@ -64,46 +64,48 @@
 				},
 				options: {
 					onClick: barChartClickEvent,
-					title: {
-						display: true,
-						text: '{stats.name} created per month'
+					plugins: {
+						legend: {
+							onHover: function(event, legendItem, legend) {
+								event.native.target.style.cursor = 'pointer';
+							},
+							onLeave: function(event, legendItem, legend) {
+								event.native.target.style.cursor = 'default';
+							},
+						},
+						title: {
+							display: true,
+							text: '{stats.name} created per month'
+						},
+						tooltip: {
+							mode: 'index',
+							intersect: false,
+						},
 					},
-					tooltips: {
-						mode: 'index',
-						intersect: false
-					},
-					legend: {
-						onHover: function(e) {
-							e.target.style.cursor = 'pointer';
-						}
-					},
-					hover: {
-						onHover: (event, chartElement) => {
-							event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-						}
+					onHover: (event, chartElement) => {
+						event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
 					},
 					responsive: true,
 					scales: {
-						xAxes: [{
+						x: {
 							stacked: true
-						}],
-						yAxes: [{
+						},
+						y: {
 							stacked: true,
-							scaleLabel: {
+							title: {
 								display: true,
-								labelString: 'Number of {stats.name}'
+								text: 'Number of {stats.name}'
 							}
-						}]
+						}
 					}
 				}
 			};
 			function barChartClickEvent(event, array){
 				if(array[0]) {
-					// console.table(array);
-					// console.table(array[0]._model);
-					var activePoint = window.barChart.getElementAtEvent(event)[0];
-					var issuesState = activePoint._datasetIndex == 0 ? "closed" : "open"
-					window.open("https://github.com/quarkusio/quarkus/issues?q=label:{stats.label}+is:issue+is:" + issuesState + "+created:" + array[0]._model.label, '_blank');
+					// console.table(array[0]);
+					var issuesState = array[0].datasetIndex == 0 ? "closed" : "open";
+					var label = barChartConfig.data.labels[array[0].index];
+					window.open("https://github.com/quarkusio/quarkus/issues?q=label:{stats.label}+is:issue+is:" + issuesState + "+created:" + label, '_blank');
 				}
 			}
 			var lineChartConfig = {
@@ -117,6 +119,7 @@
 					datasets: [{
 						label: 'Opened during month',
 						fill: false,
+						tension: 0.4,
 						backgroundColor: "#FF0000",
 						borderColor: "#FF0000",
 						data: [
@@ -127,6 +130,7 @@
 					}, {
 						label: 'Closed during month',
 						fill: false,
+						tension: 0.4,
 						backgroundColor: "#00CC00",
 						borderColor: "#00CC00",
 						data: [
@@ -137,6 +141,7 @@
 					}, {
 						label: 'Both opened and closed during month',
 						fill: false,
+						tension: 0.4,
 						backgroundColor: "#000080",
 						borderColor: "#000080",
 						data: [
@@ -148,34 +153,31 @@
 				},
 				options: {
 					responsive: true,
-					title: {
-						display: true,
-						text: 'Activity per month'
-					},
-					tooltips: {
-						mode: 'index',
-						intersect: false,
-					},
-					legend: {
-						onHover: function(e) {
-							e.target.style.cursor = 'pointer';
-						}
-					},
-					hover: {
-						mode: 'nearest',
-						intersect: true
+					plugins: {
+						legend: {
+							onHover: function(event, legendItem, legend) {
+								event.native.target.style.cursor = 'pointer';
+							},
+							onLeave: function(event, legendItem, legend) {
+								event.native.target.style.cursor = 'default';
+							},
+						},
+						title: {
+							display: true,
+							text: 'Activity per month'
+						},
+						tooltip: {
+							mode: 'index',
+							intersect: false,
+						},
 					},
 					scales: {
-						xAxes: [{
-							display: true
-						}],
-						yAxes: [{
-							display: true,
-							scaleLabel: {
+						y: {
+							title: {
 								display: true,
-								labelString: 'Number of {stats.name}'
+								text: 'Number of {stats.name}'
 							}
-						}]
+						}
 					}
 				}
 			};
