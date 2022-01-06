@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -18,15 +17,14 @@ import javax.json.JsonValue;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
-import io.smallrye.graphql.client.Error;
-import io.smallrye.graphql.client.GraphQLClient;
-import io.smallrye.graphql.client.Response;
-import io.smallrye.graphql.client.dynamic.api.DynamicGraphQLClient;
-
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.status.model.Label;
 import io.quarkus.status.model.StatsEntry;
+import io.smallrye.graphql.client.GraphQLClient;
+import io.smallrye.graphql.client.GraphQLError;
+import io.smallrye.graphql.client.Response;
+import io.smallrye.graphql.client.dynamic.api.DynamicGraphQLClient;
 
 @ApplicationScoped
 public class GitHubService {
@@ -186,13 +184,13 @@ public class GitHubService {
     }
 
     private void handleErrors(Response response) throws IOException {
-        List<Error> errors = response.getErrors();
+        List<GraphQLError> errors = response.getErrors();
         if (errors != null) {
             // Checking if there are any errors different from NOT_FOUND
             for (int k = 0; k < errors.size(); k++) {
-                Error error = errors.get(k);
-                JsonValue errorType = error.getOtherFields().getOrDefault("type", null);
-                if (errorType == null || !"NOT_FOUND".equals(((JsonString) errorType).getString())) {
+                GraphQLError error = errors.get(k);
+                Object errorType = error.getOtherFields().getOrDefault("type", null);
+                if (errorType == null || !"NOT_FOUND".equals(errorType)) {
                     throw new IOException(error.toString());
                 }
             }
