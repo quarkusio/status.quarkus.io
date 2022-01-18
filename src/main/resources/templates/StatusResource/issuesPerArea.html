@@ -1,0 +1,118 @@
+
+{#include StatusResource/base}
+	{#title}{isBugs ? 'Bugs' : 'Enhancements'} Per Area{/title}
+	{#styles}
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.semanticui.min.css">
+	{/styles}
+	{#body}
+		<div class="ui main container">
+			<div class="ui pointing menu">
+				<a class="{isBugs ? 'active' : ''} item" href="/bugs/per-area/">Bugs</a>
+				<a class="{isBugs ? '' : 'active'} item" href="/enhancements/per-area/">Enhancements</a>
+			</div>
+
+			<div class="ui message">
+				<canvas id="canvas-open-issues"></canvas>
+			</div>
+			<div class="ui message">
+				<canvas id="canvas-closed-issues"></canvas>
+			</div>
+		</div>
+	{/body}
+	{#scripts}
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.3.0/d3.min.js"></script>
+		<script>
+			const chartData = '{isBugs ? '/labels/bugs' : '/labels/enhancements'}'
+			d3.csv(chartData).then(function(datapoints) {
+				const label = [];
+				const open = [];
+				const closed = [];
+                for (i = 0; i < datapoints.length; i++) {
+				    if (datapoints[i].Label.includes("area")) {
+                        label.push(datapoints[i].Label);
+                        open.push(datapoints[i].Open);
+                        closed.push(datapoints[i].Closed);
+					}
+				}
+                const openIssuesData = {
+                    labels: label,
+                    datasets: [
+                        {
+                        data: open,
+                        backgroundColor: ['IndianRed', 'LightCoral', 'Salmon', 'DarkSalmon', 'LightSalmon', 'Crimson', 'Red', 'FireBrick', 'DarkRed', 'Pink', 'LightPink', 'HotPink', 'DeepPink', 'MediumVioletRed', 'PaleVioletRed', 'LightSalmon', 'Coral', 'Tomato', 'OrangeRed', 'DarkOrange', 'Orange', 'Gold', 'Yellow', 'PaleGoldenrod', 'Khaki', 'DarkKhaki', 'Lavender', 'Thistle', 'Plum', 'Violet', 'Orchid', 'Fuchsia', 'Magenta', 'MediumOrchid', 'MediumPurple', 'RebeccaPurple', 'BlueViolet', 'DarkViolet', 'DarkOrchid', 'DarkMagenta', 'Purple', 'Indigo', 'SlateBlue', 'DarkSlateBlue', 'MediumSlateBlue', 'GreenYellow', 'Chartreuse', 'LawnGreen', 'Lime', 'LimeGreen', 'PaleGreen', 'LightGreen', 'MediumSpringGreen', 'SpringGreen', 'MediumSeaGreen', 'SeaGreen', 'ForestGreen', 'Green', 'DarkGreen', 'YellowGreen', 'OliveDrab', 'Olive', 'DarkOliveGreen', 'MediumAquamarine', 'DarkSeaGreen', 'LightSeaGreen', 'DarkCyan', 'Teal', 'Aqua', 'Cyan', 'LightCyan', 'PaleTurquoise', 'Aquamarine', 'Turquoise', 'MediumTurquoise', 'DarkTurquoise', 'CadetBlue', 'SteelBlue', 'LightSteelBlue', 'PowderBlue', 'LightBlue', 'SkyBlue', 'LightSkyBlue', 'DeepSkyBlue', 'DodgerBlue', 'CornflowerBlue', 'MediumSlateBlue', 'RoyalBlue', 'Blue', 'MediumBlue', 'DarkBlue', 'Navy', 'MidnightBlue', 'Cornsilk', 'BlanchedAlmond', 'Bisque', 'NavajoWhite', 'Wheat', 'BurlyWood', 'Tan', 'RosyBrown', 'SandyBrown', 'Goldenrod', 'DarkGoldenrod', 'Peru', 'Chocolate', 'SaddleBrown', 'Sienna', 'Brown', 'Maroon', 'Snow', 'HoneyDew', 'MintCream', 'Azure', 'AliceBlue', 'GhostWhite', 'WhiteSmoke', 'SeaShell', 'Beige', 'OldLace', 'FloralWhite', 'Ivory', 'AntiqueWhite', 'Linen', 'LavenderBlush', 'MistyRose', 'Gainsboro', 'LightGray', 'Silver', 'DarkGray', 'Gray', 'DimGray', 'LightSlateGray', 'SlateGray', 'DarkSlateGray', 'Black'],
+                        borderWidth: 1
+                        }
+                    ]
+                };
+                const closedIssuesData = {
+                    labels: label,
+                    datasets: [
+                        {
+                        data: closed,
+                        backgroundColor: ['IndianRed', 'LightCoral', 'Salmon', 'DarkSalmon', 'LightSalmon', 'Crimson', 'Red', 'FireBrick', 'DarkRed', 'Pink', 'LightPink', 'HotPink', 'DeepPink', 'MediumVioletRed', 'PaleVioletRed', 'LightSalmon', 'Coral', 'Tomato', 'OrangeRed', 'DarkOrange', 'Orange', 'Gold', 'Yellow', 'PaleGoldenrod', 'Khaki', 'DarkKhaki', 'Lavender', 'Thistle', 'Plum', 'Violet', 'Orchid', 'Fuchsia', 'Magenta', 'MediumOrchid', 'MediumPurple', 'RebeccaPurple', 'BlueViolet', 'DarkViolet', 'DarkOrchid', 'DarkMagenta', 'Purple', 'Indigo', 'SlateBlue', 'DarkSlateBlue', 'MediumSlateBlue', 'GreenYellow', 'Chartreuse', 'LawnGreen', 'Lime', 'LimeGreen', 'PaleGreen', 'LightGreen', 'MediumSpringGreen', 'SpringGreen', 'MediumSeaGreen', 'SeaGreen', 'ForestGreen', 'Green', 'DarkGreen', 'YellowGreen', 'OliveDrab', 'Olive', 'DarkOliveGreen', 'MediumAquamarine', 'DarkSeaGreen', 'LightSeaGreen', 'DarkCyan', 'Teal', 'Aqua', 'Cyan', 'LightCyan', 'PaleTurquoise', 'Aquamarine', 'Turquoise', 'MediumTurquoise', 'DarkTurquoise', 'CadetBlue', 'SteelBlue', 'LightSteelBlue', 'PowderBlue', 'LightBlue', 'SkyBlue', 'LightSkyBlue', 'DeepSkyBlue', 'DodgerBlue', 'CornflowerBlue', 'MediumSlateBlue', 'RoyalBlue', 'Blue', 'MediumBlue', 'DarkBlue', 'Navy', 'MidnightBlue', 'Cornsilk', 'BlanchedAlmond', 'Bisque', 'NavajoWhite', 'Wheat', 'BurlyWood', 'Tan', 'RosyBrown', 'SandyBrown', 'Goldenrod', 'DarkGoldenrod', 'Peru', 'Chocolate', 'SaddleBrown', 'Sienna', 'Brown', 'Maroon', 'Snow', 'HoneyDew', 'MintCream', 'Azure', 'AliceBlue', 'GhostWhite', 'WhiteSmoke', 'SeaShell', 'Beige', 'OldLace', 'FloralWhite', 'Ivory', 'AntiqueWhite', 'Linen', 'LavenderBlush', 'MistyRose', 'Gainsboro', 'LightGray', 'Silver', 'DarkGray', 'Gray', 'DimGray', 'LightSlateGray', 'SlateGray', 'DarkSlateGray', 'Black'],
+                        borderWidth: 1
+                        }
+                    ]
+                };
+                var openIssuesDataConfig = {
+                    type: 'doughnut',
+                    data: openIssuesData,
+                    options: {
+                        onClick: openIssuesClickEvent,
+                        responsive: true,
+                        plugins: {
+							legend: {
+								display: true,
+								position: 'top',
+							},
+							title: {
+								display: true,
+								text: 'Open Issues Per Area'
+							}
+                        },
+                        onHover: (event, chartElement) => {
+							event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+						},
+                    },
+				};
+                var closedIssuesDataConfig = {
+                    type: 'doughnut',
+                    data: closedIssuesData,
+                    options: {
+                        onClick: closedIssuesClickEvent,
+                        responsive: true,
+                        plugins: {
+							legend: {
+								display: true,
+								position: 'top',
+							},
+							title: {
+								display: true,
+								text: 'Closed Issues Per Area'
+							}
+                        },
+                        onHover: (event, chartElement) => {
+							event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+						},
+                    },
+				};
+				function openIssuesClickEvent(event, array){
+                    if(array[0]) {
+                        var label = openIssuesDataConfig.data.labels[array[0].index];
+                        window.open("https://github.com/quarkusio/quarkus/issues?q=label:{isBugs ? 'kind/bug' : 'kind/enhancement'}+is:issue+is:open+label:" + label, '_blank');
+                    }
+                }
+				function closedIssuesClickEvent(event, array){
+                    if(array[0]) {
+                        var label = openIssuesDataConfig.data.labels[array[0].index];
+                        window.open("https://github.com/quarkusio/quarkus/issues?q=label:{isBugs ? 'kind/bug' : 'kind/enhancement'}+is:issue+is:closed+label:" + label, '_blank');
+                    }
+                }
+
+                const openIssuesChart = new Chart(document.getElementById('canvas-open-issues').getContext('2d'), openIssuesDataConfig);
+                const closedIssuesChart = new Chart(document.getElementById('canvas-closed-issues').getContext('2d'), closedIssuesDataConfig);
+			});
+		</script>
+	{/scripts}
+{/include}

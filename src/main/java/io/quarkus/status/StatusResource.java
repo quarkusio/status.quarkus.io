@@ -27,6 +27,7 @@ public class StatusResource {
     public static class Templates {
         public static native TemplateInstance index(Status status);
         public static native TemplateInstance issues(Status status, Stats stats, boolean isBugs);
+        public static native TemplateInstance issuesPerArea(Status status, boolean isBugs);
     }
 
     @GET
@@ -66,4 +67,19 @@ public class StatusResource {
         labelsService.getEnhancementsLabels().forEach( label -> sb.append(label).append("\n"));
         return sb.toString();
     }
+
+    @GET
+    @Path("bugs/per-area")
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance bugsPerArea() throws Exception {
+        return Templates.issuesPerArea(statusService.getStatus(), true);
+    }
+
+    @GET
+    @Path("enhancements/per-area")
+    @Produces(MediaType.TEXT_HTML)
+    public TemplateInstance enhancementsPerArea() throws Exception {
+        return Templates.issuesPerArea(statusService.getStatus(), false);
+    }
+
 }
