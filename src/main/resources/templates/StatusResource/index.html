@@ -32,7 +32,16 @@
 							</div>
 							{#if line.failure && line.failureMessage}
 							<div class="ui piled segment failure-message">
-								{line.failureMessage.raw}
+							{#if line.failureMessage.type.fullReport}
+								The build failed. Click for more details:
+								<details>
+								<div class="details-full-report">
+								{line.failureMessage.message.raw}
+								</div>
+								</details>
+							{#else}
+								{line.failureMessage.message.raw}
+							{/if}
 							</div>
 							{/if}
 						</td>
