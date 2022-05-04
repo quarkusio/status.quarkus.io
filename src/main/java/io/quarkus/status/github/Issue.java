@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import io.quarkus.status.github.FailureMessage.FailureMessageType;
 
 @RegisterForReflection
 public class Issue implements Comparable<Issue> {
@@ -26,10 +27,17 @@ public class Issue implements Comparable<Issue> {
         return "OPEN".equals(state);
     }
 
-    public String getFailureMessage() {
+    public FailureMessage getFailureMessage() {
         for (Comment comment : lastComments) {
-            if (comment.bodyText.contains("Link to latest CI run")) {
-                return comment.bodyHTML;
+            if (comment.body == null || comment.bodyHTML == null) {
+                continue;
+            }
+            if (comment.body.contains(FailureMessage.FULL_REPORT_MARKER)) {
+                return new FailureMessage(FailureMessageType.FULL_REPORT, comment.bodyHTML.replace("<table role=\"table\">",
+                        "<table role=\"table\" class=\"ui celled table compact\">"));
+            }
+            if (comment.body.contains(FailureMessage.COMMENT_MARKER)) {
+                return new FailureMessage(FailureMessageType.COMMENT, comment.bodyHTML);
             }
         }
         return null;

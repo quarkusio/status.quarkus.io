@@ -34,3 +34,27 @@
 .ui.icon.message > i.icon:not(.close) {
 	font-size: 1em;
 }
+
+.details-full-report {
+  color: #666;
+}
+
+g-emoji[alias=heavy_check_mark] {
+  color: green;
+}
+
+g-emoji[alias=heavy_multiplication_x] {
+  color: #9f3a38;
+}
+
+.details-full-report h2 {
+  font-size: 1.3em;
+}
+
+.details-full-report h3 {
+  font-size: 1.2em;
+}
+
+.details-full-report h4 {
+  font-size: 1.1em;
+}

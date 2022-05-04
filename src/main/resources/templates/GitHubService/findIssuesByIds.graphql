@@ -19,7 +19,7 @@ fragment issueFields on Issue {
   comments(last: 20) {
     nodes {
       id
-      bodyText
+      body
       bodyHTML
       author {
         ... on User {

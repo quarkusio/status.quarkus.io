@@ -8,7 +8,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 public class Comment {
 
     public String id;
-    public String bodyText;
+    public String body;
     public String bodyHTML;
     public User author;
 
@@ -17,7 +17,7 @@ public class Comment {
         return "Comment{" +
                 "id='" + id + '\'' +
                 ", author='" + author + '\'' +
-                ", bodyText='" + bodyText + '\'' +
+                ", body='" + body + '\'' +
                 '}';
     }
 

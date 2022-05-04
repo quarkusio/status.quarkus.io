@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import io.quarkus.status.github.FailureMessage;
 
 @RegisterForReflection
 public class StatusLine implements Comparable<StatusLine> {
@@ -12,7 +13,7 @@ public class StatusLine implements Comparable<StatusLine> {
 
     public String url;
 
-    public String failureMessage;
+    public FailureMessage failureMessage;
 
     public StatusCode statusCode;
 
