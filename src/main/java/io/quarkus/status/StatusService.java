@@ -29,7 +29,9 @@ public class StatusService {
             15417,
             23612,
             24396,
-            25363
+            25363,
+            26581,
+            26582
     );
     private static final String QUARKUS_IO_ORG = "quarkusio";
     private static final String MAIN_REPOSITORY = "quarkus";
