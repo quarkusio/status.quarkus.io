@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -190,7 +191,11 @@ public class GitHubService {
             // Checking if there are any errors different from NOT_FOUND
             for (int k = 0; k < errors.size(); k++) {
                 GraphQLError error = errors.get(k);
-                Object errorType = error.getOtherFields().getOrDefault("type", null);
+                Map<String, Object> otherFields = error.getOtherFields();
+                if(otherFields == null || otherFields.isEmpty()) {
+                    throw new IOException(error.toString());
+                }
+                Object errorType = otherFields.getOrDefault("type", null);
                 if (errorType == null || !"NOT_FOUND".equals(errorType)) {
                     throw new IOException(error.toString());
                 }
