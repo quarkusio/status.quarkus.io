@@ -186,6 +186,10 @@ public class GitHubService {
     }
 
     private void handleErrors(Response response) throws IOException {
+        if(response == null) {
+            throw new RuntimeException("No response received. This is very odd...");
+        }
+
         List<GraphQLError> errors = response.getErrors();
         if (errors != null) {
             // Checking if there are any errors different from NOT_FOUND
