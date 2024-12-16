@@ -19,20 +19,20 @@ import io.quarkus.status.model.StatusSection;
 public class StatusService {
 
     private static final List<Integer> MAIN_ISSUES = Arrays.asList(
-            15867,
-            6588,
-            12111,
-            35716,
-            11515,
-            17071,
-            13058,
-            19500,
-            15417,
-            23612,
-            26581,
-            26582,
-            31837,
-            32191
+            // 15867 // JDK early access
+            6588, // Quickstarts native
+            12111, // Core snapshots deployment
+            35716, // Platform snapshots deployment
+            11515, // code.quarkus.io
+            17071, // Sync main documentation to website
+            13058, // Release process testing
+            19500, // Quarkus QE test suite
+            15417, // Quarkus Beefy test suite
+            23612, // Quarkus Super Heroes testing
+            26581, // Kubernetes end to end testing
+            // 26582, // OpenShift end to end testing
+            31837, // Knative end to end testing
+            32191 // Quarkus updates recipes testing
     );
     private static final String QUARKUS_IO_ORG = "quarkusio";
     private static final String MAIN_REPOSITORY = "quarkus";
