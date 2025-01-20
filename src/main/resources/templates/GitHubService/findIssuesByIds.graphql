@@ -16,27 +16,11 @@ fragment issueFields on Issue {
   body
   state
   closedAt
-  comments(last: 20) {
+  comments(last: 10) {
     nodes {
       id
       body
       bodyHTML
-      author {
-        ... on User {
-          login
-          avatarUrl
-          name
-          url
-        }
-      }
-    }
-  }
-  author {
-    ... on User {
-      login
-      avatarUrl
-      name
-      url
     }
   }
 }
