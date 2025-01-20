@@ -10,13 +10,11 @@ public class Comment {
     public String id;
     public String body;
     public String bodyHTML;
-    public User author;
 
     @Override
     public String toString() {
         return "Comment{" +
                 "id='" + id + '\'' +
-                ", author='" + author + '\'' +
                 ", body='" + body + '\'' +
                 '}';
     }
