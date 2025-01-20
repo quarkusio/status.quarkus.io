@@ -1,6 +1,7 @@
 package io.quarkus.status;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -104,8 +105,16 @@ public class StatusService {
         StatusLine statusLine = new StatusLine();
         statusLine.name = issue.title;
         statusLine.url = issue.url;
-        statusLine.statusCode = issue.isOpen() ? StatusCode.FAILURE : StatusCode.SUCCESS;
+        statusLine.statusCode = determineStatusCode(issue);
         statusLine.failureMessage = issue.getFailureMessage();
         return statusLine;
+    }
+
+    private static StatusCode determineStatusCode(Issue issue) {
+        if (issue.updatedAt == null || ChronoUnit.DAYS.between(issue.updatedAt, LocalDateTime.now()) > 2) {
+            return StatusCode.WARNING;
+        }
+
+        return issue.isOpen() ? StatusCode.FAILURE : StatusCode.SUCCESS;
     }
 }

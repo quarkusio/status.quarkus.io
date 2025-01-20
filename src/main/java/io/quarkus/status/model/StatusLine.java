@@ -23,6 +23,10 @@ public class StatusLine implements Comparable<StatusLine> {
         return statusCode == StatusCode.FAILURE;
     }
 
+    public boolean isWarning() {
+        return statusCode == StatusCode.WARNING;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

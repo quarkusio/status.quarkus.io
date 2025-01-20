@@ -1,7 +1,9 @@
 package io.quarkus.status.github;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,7 +11,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.json.JsonArray;
@@ -26,11 +34,23 @@ import io.smallrye.graphql.client.GraphQLClient;
 import io.smallrye.graphql.client.GraphQLError;
 import io.smallrye.graphql.client.Response;
 import io.smallrye.graphql.client.dynamic.api.DynamicGraphQLClient;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class GitHubService {
 
+    private static final Logger LOG = Logger.getLogger(GitHubService.class);
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final String STATUS_MARKER = "<!-- status.quarkus.io/status:";
+    private static final String END_OF_MARKER = "-->";
+    private static final Pattern STATUS_PATTERN = Pattern.compile(STATUS_MARKER + "\r?\n(.*?)\r?\n" + END_OF_MARKER,
+            Pattern.DOTALL);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
+
+    static {
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
 
     @Inject
     @GraphQLClient("github")
@@ -167,11 +187,11 @@ public class GitHubService {
         issue.id = issueJson.getString("id");
         issue.title = issueJson.getString("title");
         issue.number = issueJson.getInt("number");
-        issue.author = jsonb.fromJson(issueJson.getJsonObject("author").toString(), User.class);
         issue.body = issueJson.getString("body");
         issue.closedAt = issueJson.get("closedAt") != JsonValue.NULL
                 ? LocalDateTime.parse(issueJson.getString("closedAt"), DATE_TIME_FORMATTER)
                 : null;
+        issue.updatedAt = extractUpdatedAt(issue.body);
         issue.state = issueJson.getString("state");
         issue.url = issueJson.getString("url");
 
@@ -235,4 +255,25 @@ public class GitHubService {
         public static native TemplateInstance labelsStats(String owner, String repo, String label, int count, String cursor);
     }
 
+    private static LocalDateTime extractUpdatedAt(String body) {
+        if (body == null || body.isBlank()) {
+            return null;
+        }
+
+        Matcher matcher = STATUS_PATTERN.matcher(body);
+        if (!matcher.find()) {
+            return null;
+        }
+
+        try {
+            Status status = OBJECT_MAPPER.readValue(matcher.group(1), Status.class);
+            return LocalDateTime.ofInstant(status.updatedAt, ZoneId.systemDefault());
+        } catch (Exception e) {
+            LOG.warn("Unable to extract Status from issue body", e);
+            return null;
+        }
+    }
+
+    public record Status(Instant updatedAt, boolean failure, String repository, Long runId) {
+    }
 }
