@@ -18,6 +18,7 @@ public class Issue implements Comparable<Issue> {
     public String url;
     public String state;
     public LocalDateTime closedAt;
+    public LocalDateTime updatedAt;
 
     public User author;
 

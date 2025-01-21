@@ -25,7 +25,7 @@
 				</thead>
 				<tbody>
 					{#for line in section.value.lines}
-					<tr class="{#if line.failure}negative{#else}positive{/if}">
+					<tr class="{#if line.failure}negative{#else if line.warning}warning{#else}positive{/if}">
 						<td>
 							<div>
 								<strong><a href="{line.url}" target="_blank">{line.name}</a></strong>
@@ -48,6 +48,8 @@
 						<td class="center aligned">
 							{#if line.failure}
 								<i class="red icon exclamation circle large"></i>
+							{#else if line.warning}
+								<i class="orange icon attention circle large" title="Data looks stale"></i>
 							{#else}
 								<i class="green icon check circle large"></i>
 							{/if}
