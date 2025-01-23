@@ -103,6 +103,7 @@ public class GitHubService {
 
         StatsEntry statsEntry = new StatsEntry();
         statsEntry.entryName = entryName;
+        statsEntry.timeWindow = timeWindow;
         statsEntry.created = data.getJsonObject("created").getInt("issueCount");
         statsEntry.createdAndClosedNow = data.getJsonObject("createdAndClosedNow").getInt("issueCount");
         statsEntry.createdAndOpenNow = data.getJsonObject("createdAndStillOpen").getInt("issueCount");
