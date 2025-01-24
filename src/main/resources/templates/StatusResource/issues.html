@@ -43,6 +43,11 @@
 						"{entry.entryName}",
 					{/for}
 					],
+					timeWindows: [
+					{#for entry in stats.entries}
+						"{entry.timeWindow}",
+					{/for}
+					],
 					datasets: [{
 						label: 'Closed',
 						backgroundColor: "#00CC00",
@@ -104,8 +109,8 @@
 				if(array[0]) {
 					// console.table(array[0]);
 					var issuesState = array[0].datasetIndex == 0 ? "closed" : "open";
-					var label = barChartConfig.data.labels[array[0].index];
-					window.open("https://github.com/quarkusio/quarkus/issues?q=label:{stats.label}+is:issue+is:" + issuesState + "+created:" + label, '_blank');
+					var timeWindow = barChartConfig.data.timeWindows[array[0].index];
+					window.open("https://github.com/quarkusio/quarkus/issues?q=label:{stats.label}+is:issue+is:" + issuesState + "+created:" + timeWindow, '_blank');
 				}
 			}
 			var lineChartConfig = {

@@ -5,6 +5,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @RegisterForReflection
 public class StatsEntry {
     public String entryName;
+    public String timeWindow;
     public Integer created;
     public Integer createdAndClosedNow;
     public Integer createdAndOpenNow;
