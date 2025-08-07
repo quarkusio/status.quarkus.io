@@ -3,6 +3,8 @@ package io.quarkus.status;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -65,26 +67,21 @@ public class IssuesService {
     }
 
     private Stats buildIssuesMonthlyStats(String name, String label) throws Exception {
-        Stats stats = new Stats();
-        stats.name = name;
-        stats.label = label;
-        stats.updated = LocalDateTime.now();
-        stats.repository = QUARKUS_REPOSITORY;
-
         LocalDate start = issuesStatsStart;
         LocalDate stopTime = LocalDate.now().withDayOfMonth(2);
 
+        List<StatsEntry> entries = new ArrayList<>();
         while (start.isBefore(stopTime)) {
             LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
             String timeWindow = start + ".." + end;
 
             StatsEntry statsEntry = gitHubService.issuesStats(QUARKUS_REPOSITORY, label, timeWindow, FORMATTER.format(start));
-            stats.add(statsEntry);
+            entries.add(statsEntry);
 
             start = start.plusMonths(1);
         }
 
-        return stats;
+        return new Stats(name, label, LocalDateTime.now(), QUARKUS_REPOSITORY, entries);
     }
 
 }

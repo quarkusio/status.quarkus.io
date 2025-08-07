@@ -55,7 +55,7 @@ public class StatusResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String bugsLabels() throws Exception {
         StringBuilder sb = new StringBuilder();
-        labelsService.getBugsLabels().forEach( label -> sb.append(label).append("\n"));
+        labelsService.getBugsLabels().forEach( label -> sb.append(label.toCsv()).append("\n"));
         return sb.toString();
     }
 
@@ -64,7 +64,7 @@ public class StatusResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String enhancementsLabels() throws Exception {
         StringBuilder sb = new StringBuilder();
-        labelsService.getEnhancementsLabels().forEach( label -> sb.append(label).append("\n"));
+        labelsService.getEnhancementsLabels().forEach( label -> sb.append(label.toCsv()).append("\n"));
         return sb.toString();
     }
 

@@ -7,16 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 @RegisterForReflection
-public class Stats {
-
-    public String name;
-    public String label;
-    public LocalDateTime updated;
-    public String repository;
-
-    public List<StatsEntry> entries = new LinkedList<>();
-
-    public void add(StatsEntry statsEntry) {
-        entries.add(statsEntry);
-    }
+public record Stats(String name,
+                    String label,
+                    LocalDateTime updated,
+                    String repository,
+                    List<StatsEntry> entries) {
 }
