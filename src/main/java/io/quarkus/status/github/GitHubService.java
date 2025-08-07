@@ -1,7 +1,6 @@
 package io.quarkus.status.github;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -14,12 +13,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.quarkus.status.model.StatusLine.BuildStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.json.JsonArray;
@@ -28,15 +21,23 @@ import jakarta.json.JsonValue;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 
+import org.jboss.logging.Logger;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.status.model.Label;
 import io.quarkus.status.model.StatsEntry;
+import io.quarkus.status.model.StatusLine.BuildStatus;
 import io.smallrye.graphql.client.GraphQLClient;
 import io.smallrye.graphql.client.GraphQLError;
 import io.smallrye.graphql.client.Response;
 import io.smallrye.graphql.client.dynamic.api.DynamicGraphQLClient;
-import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class GitHubService {
@@ -109,8 +110,7 @@ public class GitHubService {
                 data.getJsonObject("createdAndClosedNow").getInt("issueCount"),
                 data.getJsonObject("createdAndStillOpen").getInt("issueCount"),
                 data.getJsonObject("closed").getInt("issueCount"),
-                data.getJsonObject("createdAndClosed").getInt("issueCount")
-        );
+                data.getJsonObject("createdAndClosed").getInt("issueCount"));
     }
 
     public List<Label> labelsStats(String owner, String repository, String mainLabel, boolean subsetOnly) throws Exception {
@@ -130,7 +130,8 @@ public class GitHubService {
         return labels;
     }
 
-    private String extractLabels(String owner, String repository, String mainLabel, int returnedElements, String cursor, List<Label> labels) throws Exception {
+    private String extractLabels(String owner, String repository, String mainLabel, int returnedElements, String cursor,
+            List<Label> labels) throws Exception {
         String query = Templates.labelsStats(owner, repository, mainLabel, returnedElements, cursor).render();
         Response response = graphQLClient.executeSync(query);
         handleErrors(response);
@@ -150,8 +151,7 @@ public class GitHubService {
             labels.add(new Label(
                     issueJson.getString("name"),
                     String.valueOf(issueJson.getJsonObject("open").getInt("totalCount")),
-                    String.valueOf(issueJson.getJsonObject("closed").getInt("totalCount"))
-            ));
+                    String.valueOf(issueJson.getJsonObject("closed").getInt("totalCount"))));
         }
 
         if (pageInfoJson.getBoolean("hasNextPage")) {
@@ -203,18 +203,17 @@ public class GitHubService {
                 issueJson.getString("url"),
                 issueJson.getString("state"),
                 issueJson.get("closedAt") != JsonValue.NULL
-                ? LocalDateTime.parse(issueJson.getString("closedAt"), DATE_TIME_FORMATTER)
+                        ? LocalDateTime.parse(issueJson.getString("closedAt"), DATE_TIME_FORMATTER)
                         : null,
                 buildStatus != null ? LocalDateTime.ofInstant(buildStatus.updatedAt(), ZoneId.systemDefault()) : null,
                 buildStatus,
-                comments
-        );
+                comments);
 
         return issue;
     }
 
     private void handleErrors(Response response) throws IOException {
-        if(response == null) {
+        if (response == null) {
             throw new RuntimeException("No response received. This is very odd...");
         }
 
@@ -224,7 +223,7 @@ public class GitHubService {
             for (int k = 0; k < errors.size(); k++) {
                 GraphQLError error = errors.get(k);
                 Map<String, Object> otherFields = error.getOtherFields();
-                if(otherFields == null || otherFields.isEmpty()) {
+                if (otherFields == null || otherFields.isEmpty()) {
                     throw new IOException(error.toString());
                 }
                 Object errorType = otherFields.getOrDefault("type", null);
@@ -233,7 +232,7 @@ public class GitHubService {
                 }
             }
         }
-        if(response.getData() == null || response.getData().equals(JsonValue.NULL)) {
+        if (response.getData() == null || response.getData().equals(JsonValue.NULL)) {
             throw new RuntimeException("No data received in response. Is the auth token correct?");
         }
     }
@@ -250,7 +249,6 @@ public class GitHubService {
          * Returns the issues given a label
          */
         public static native TemplateInstance findIssuesByLabel(String owner, String repo, String label);
-
 
         /**
          * Returns the issue stats for given repository, label and time window

@@ -26,7 +26,9 @@ public class StatusResource {
     @CheckedTemplate
     public static class Templates {
         public static native TemplateInstance index(Status status);
+
         public static native TemplateInstance issues(Status status, Stats stats, boolean isBugs);
+
         public static native TemplateInstance issuesPerArea(Status status, boolean isBugs);
     }
 
@@ -55,7 +57,7 @@ public class StatusResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String bugsLabels() throws Exception {
         StringBuilder sb = new StringBuilder();
-        labelsService.getBugsLabels().forEach( label -> sb.append(label.toCsv()).append("\n"));
+        labelsService.getBugsLabels().forEach(label -> sb.append(label.toCsv()).append("\n"));
         return sb.toString();
     }
 
@@ -64,7 +66,7 @@ public class StatusResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String enhancementsLabels() throws Exception {
         StringBuilder sb = new StringBuilder();
-        labelsService.getEnhancementsLabels().forEach( label -> sb.append(label.toCsv()).append("\n"));
+        labelsService.getEnhancementsLabels().forEach(label -> sb.append(label.toCsv()).append("\n"));
         return sb.toString();
     }
 

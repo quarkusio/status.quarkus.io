@@ -9,11 +9,11 @@ import io.quarkus.status.github.FailureMessage;
 
 @RegisterForReflection
 public record StatusLine(String name,
-                         String url,
-                         FailureMessage failureMessage,
-                         StatusCode statusCode,
-                         int order,
-                         BuildStatus buildStatus) implements Comparable<StatusLine> {
+        String url,
+        FailureMessage failureMessage,
+        StatusCode statusCode,
+        int order,
+        BuildStatus buildStatus) implements Comparable<StatusLine> {
 
     public boolean isFailure() {
         return statusCode == StatusCode.FAILURE;
@@ -51,7 +51,7 @@ public record StatusLine(String name,
 
     @RegisterForReflection
     public record BuildStatus(Instant updatedAt, boolean failure, String repository, Long runId,
-                              String quarkusSha, String projectSha, BuildState firstFailure, BuildState lastFailure, BuildState lastSuccess) {
+            String quarkusSha, String projectSha, BuildState firstFailure, BuildState lastFailure, BuildState lastSuccess) {
     }
 
     @RegisterForReflection

@@ -2,7 +2,6 @@ package io.quarkus.status.model;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

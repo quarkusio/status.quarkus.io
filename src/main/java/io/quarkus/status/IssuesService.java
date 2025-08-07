@@ -9,11 +9,12 @@ import java.util.List;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import io.quarkus.scheduler.Scheduled;
 import io.quarkus.status.github.GitHubService;
 import io.quarkus.status.model.Stats;
 import io.quarkus.status.model.StatsEntry;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class IssuesService {
