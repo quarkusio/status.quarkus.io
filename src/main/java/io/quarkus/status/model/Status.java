@@ -1,23 +1,18 @@
 package io.quarkus.status.model;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
-public class Status {
+public record Status(Map<String, StatusSection> sections, LocalDateTime updated) {
 
     public static final String MAIN_ID = "main";
     public static final String PLATFORM_ID = "platform";
     public static final String QUARKIVERSE_ID = "quarkiverse";
 
-    public Map<String, StatusSection> sections = new LinkedHashMap<>();
-
-    public LocalDateTime updated;
-
-    public StatusCode getStatusCode() {
+    public StatusCode statusCode() {
         StatusCode statusCode = StatusCode.SUCCESS;
         for (StatusSection section : sections.values()) {
             if (section.getStatusCode().overrides(statusCode)) {
@@ -28,8 +23,7 @@ public class Status {
         return statusCode;
     }
 
-    public boolean isFailure() {
-        return getStatusCode() == StatusCode.FAILURE;
+    public boolean failure() {
+        return statusCode() == StatusCode.FAILURE;
     }
-
 }

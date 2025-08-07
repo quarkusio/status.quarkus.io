@@ -16,9 +16,10 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.quarkus.runtime.annotations.RegisterForReflection;
+import io.quarkus.status.model.StatusLine.BuildStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.json.JsonArray;
@@ -51,6 +52,7 @@ public class GitHubService {
     static {
         OBJECT_MAPPER.registerModule(new JavaTimeModule());
         OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        OBJECT_MAPPER.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Inject
@@ -100,17 +102,15 @@ public class GitHubService {
 
         JsonObject data = response.getData();
 
-
-        StatsEntry statsEntry = new StatsEntry();
-        statsEntry.entryName = entryName;
-        statsEntry.timeWindow = timeWindow;
-        statsEntry.created = data.getJsonObject("created").getInt("issueCount");
-        statsEntry.createdAndClosedNow = data.getJsonObject("createdAndClosedNow").getInt("issueCount");
-        statsEntry.createdAndOpenNow = data.getJsonObject("createdAndStillOpen").getInt("issueCount");
-        statsEntry.closed = data.getJsonObject("closed").getInt("issueCount");
-        statsEntry.createdAndClosed = data.getJsonObject("createdAndClosed").getInt("issueCount");
-
-        return statsEntry;
+        return new StatsEntry(
+                entryName,
+                timeWindow,
+                data.getJsonObject("created").getInt("issueCount"),
+                data.getJsonObject("createdAndClosedNow").getInt("issueCount"),
+                data.getJsonObject("createdAndStillOpen").getInt("issueCount"),
+                data.getJsonObject("closed").getInt("issueCount"),
+                data.getJsonObject("createdAndClosed").getInt("issueCount")
+        );
     }
 
     public List<Label> labelsStats(String owner, String repository, String mainLabel, boolean subsetOnly) throws Exception {
@@ -126,7 +126,7 @@ public class GitHubService {
             } while (cursor != null);
         }
 
-        Collections.sort(labels, Comparator.comparing(label -> label.name));
+        Collections.sort(labels, Comparator.comparing(Label::name));
         return labels;
     }
 
@@ -185,17 +185,8 @@ public class GitHubService {
     }
 
     private Issue extractIssue(JsonObject issueJson) {
-        Issue issue = new Issue();
-        issue.id = issueJson.getString("id");
-        issue.title = issueJson.getString("title");
-        issue.number = issueJson.getInt("number");
-        issue.body = issueJson.getString("body");
-        issue.closedAt = issueJson.get("closedAt") != JsonValue.NULL
-                ? LocalDateTime.parse(issueJson.getString("closedAt"), DATE_TIME_FORMATTER)
-                : null;
-        issue.updatedAt = extractUpdatedAt(issue.body);
-        issue.state = issueJson.getString("state");
-        issue.url = issueJson.getString("url");
+        String body = issueJson.getString("body");
+        BuildStatus buildStatus = extractBuildStatus(body);
 
         JsonArray commentsJson = issueJson.getJsonObject("comments").getJsonArray("nodes");
         List<Comment> comments = new ArrayList<>();
@@ -203,7 +194,22 @@ public class GitHubService {
             comments.add(jsonb.fromJson(commentsJson.getJsonObject(j).toString(), Comment.class));
         }
         Collections.reverse(comments);
-        issue.lastComments = comments;
+
+        Issue issue = new Issue(
+                issueJson.getString("id"),
+                issueJson.getInt("number"),
+                issueJson.getString("title"),
+                issueJson.getString("body"),
+                issueJson.getString("url"),
+                issueJson.getString("state"),
+                issueJson.get("closedAt") != JsonValue.NULL
+                ? LocalDateTime.parse(issueJson.getString("closedAt"), DATE_TIME_FORMATTER)
+                        : null,
+                buildStatus != null ? LocalDateTime.ofInstant(buildStatus.updatedAt(), ZoneId.systemDefault()) : null,
+                buildStatus,
+                comments
+        );
+
         return issue;
     }
 
@@ -257,7 +263,7 @@ public class GitHubService {
         public static native TemplateInstance labelsStats(String owner, String repo, String label, int count, String cursor);
     }
 
-    private static LocalDateTime extractUpdatedAt(String body) {
+    private static BuildStatus extractBuildStatus(String body) {
         if (body == null || body.isBlank()) {
             return null;
         }
@@ -268,15 +274,10 @@ public class GitHubService {
         }
 
         try {
-            Status status = OBJECT_MAPPER.readValue(matcher.group(1), Status.class);
-            return LocalDateTime.ofInstant(status.updatedAt, ZoneId.systemDefault());
+            return OBJECT_MAPPER.readValue(matcher.group(1), BuildStatus.class);
         } catch (Exception e) {
             LOG.warn("Unable to extract Status from issue body", e);
             return null;
         }
-    }
-
-    @RegisterForReflection
-    public record Status(Instant updatedAt, boolean failure, String repository, Long runId) {
     }
 }

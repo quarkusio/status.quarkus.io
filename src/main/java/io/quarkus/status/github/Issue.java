@@ -6,39 +6,35 @@ import java.util.Objects;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.quarkus.status.github.FailureMessage.FailureMessageType;
+import io.quarkus.status.model.StatusLine.BuildStatus;
 
 @RegisterForReflection
-public class Issue implements Comparable<Issue> {
-
-    public String id;
-    public int number;
-
-    public String title;
-    public String body;
-    public String url;
-    public String state;
-    public LocalDateTime closedAt;
-    public LocalDateTime updatedAt;
-
-    public User author;
-
-    public List<Comment> lastComments;
+public record Issue(String id,
+                    int number,
+                    String title,
+                    String body,
+                    String url,
+                    String state,
+                    LocalDateTime closedAt,
+                    LocalDateTime updatedAt,
+                    BuildStatus buildStatus,
+                    List<Comment> lastComments) implements Comparable<Issue> {
 
     public boolean isOpen() {
         return "OPEN".equals(state);
     }
 
-    public FailureMessage getFailureMessage() {
+    public FailureMessage failureMessage() {
         for (Comment comment : lastComments) {
-            if (comment.body == null || comment.bodyHTML == null) {
+            if (comment.body() == null || comment.bodyHTML() == null) {
                 continue;
             }
-            if (comment.body.contains(FailureMessage.FULL_REPORT_MARKER)) {
-                return new FailureMessage(FailureMessageType.FULL_REPORT, comment.bodyHTML.replace("<table role=\"table\">",
+            if (comment.body().contains(FailureMessage.FULL_REPORT_MARKER)) {
+                return new FailureMessage(FailureMessageType.FULL_REPORT, comment.bodyHTML().replace("<table role=\"table\">",
                         "<table role=\"table\" class=\"ui celled table compact\">"));
             }
-            if (comment.body.contains(FailureMessage.COMMENT_MARKER)) {
-                return new FailureMessage(FailureMessageType.COMMENT, comment.bodyHTML);
+            if (comment.body().contains(FailureMessage.COMMENT_MARKER)) {
+                return new FailureMessage(FailureMessageType.COMMENT, comment.bodyHTML());
             }
         }
         return null;
@@ -62,15 +58,5 @@ public class Issue implements Comparable<Issue> {
     @Override
     public int compareTo(Issue o) {
         return number - o.number;
-    }
-
-    @Override
-    public String toString() {
-        return "Issue{" +
-                "number=" + number +
-                ", title='" + title + '\'' +
-                ", body='" + body + '\'' +
-                ", url='" + url + '\'' +
-                '}';
     }
 }

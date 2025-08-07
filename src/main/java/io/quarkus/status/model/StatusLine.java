@@ -1,5 +1,6 @@
 package io.quarkus.status.model;
 
+import java.time.Instant;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -7,17 +8,12 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import io.quarkus.status.github.FailureMessage;
 
 @RegisterForReflection
-public class StatusLine implements Comparable<StatusLine> {
-
-    public String name;
-
-    public String url;
-
-    public FailureMessage failureMessage;
-
-    public StatusCode statusCode;
-
-    public int order = -1;
+public record StatusLine(String name,
+                         String url,
+                         FailureMessage failureMessage,
+                         StatusCode statusCode,
+                         int order,
+                         BuildStatus buildStatus) implements Comparable<StatusLine> {
 
     public boolean isFailure() {
         return statusCode == StatusCode.FAILURE;
@@ -36,23 +32,12 @@ public class StatusLine implements Comparable<StatusLine> {
             return false;
         }
         StatusLine other = (StatusLine) o;
-        return name.equals(other.name);
+        return Objects.equals(name, other.name);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return "StatusLine{" +
-                "name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                ", failureMessage='" + failureMessage + '\'' +
-                ", statusCode='" + statusCode + '\'' +
-                ", order=" + order +
-                '}';
     }
 
     @Override
@@ -62,5 +47,14 @@ public class StatusLine implements Comparable<StatusLine> {
         }
 
         return name.toLowerCase(Locale.ROOT).compareTo(o.name.toLowerCase(Locale.ROOT));
+    }
+
+    @RegisterForReflection
+    public record BuildStatus(Instant updatedAt, boolean failure, String repository, Long runId,
+                              String quarkusSha, String projectSha, BuildState firstFailure, BuildState lastFailure, BuildState lastSuccess) {
+    }
+
+    @RegisterForReflection
+    public record BuildState(Instant date, String quarkusSha, String projectSha) {
     }
 }

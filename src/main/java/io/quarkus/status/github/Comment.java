@@ -5,19 +5,7 @@ import java.util.Objects;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
-public class Comment {
-
-    public String id;
-    public String body;
-    public String bodyHTML;
-
-    @Override
-    public String toString() {
-        return "Comment{" +
-                "id='" + id + '\'' +
-                ", body='" + body + '\'' +
-                '}';
-    }
+public record Comment(String id, String body, String bodyHTML) {
 
     @Override
     public boolean equals(Object o) {

@@ -3,7 +3,11 @@ package io.quarkus.status;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -68,50 +72,50 @@ public class StatusService {
     }
 
     private Status buildStatus() throws Exception {
-        Status status = new Status();
-        status.updated = LocalDateTime.now();
+        Map<String, StatusSection> sections = new LinkedHashMap<>();
 
-        StatusSection mainSection = new StatusSection();
-        mainSection.name = "Main Builds";
+        Set<StatusLine> mainSectionLines = new TreeSet<>();
         int i = 0;
         for (Issue issue : gitHubService.findIssuesById(QUARKUS_IO_ORG, MAIN_REPOSITORY, MAIN_ISSUES)) {
-            StatusLine statusLine = fromIssue(issue);
-            // we want to respect the order
-            statusLine.order = i++;
-            mainSection.lines.add(statusLine);
+            StatusLine statusLine = fromIssue(issue, i++);
+            mainSectionLines.add(statusLine);
         }
-        status.sections.put(Status.MAIN_ID, mainSection);
+        StatusSection mainSection = new StatusSection("Main Builds", mainSectionLines);
 
-        StatusSection platformSection = new StatusSection();
-        platformSection.name = "Platform";
+        Set<StatusLine> platformStatusLines = new TreeSet<>();
         for (Issue issue : gitHubService.findIssuesByLabel(QUARKUS_IO_ORG, MAIN_REPOSITORY, PLATFORM_LABEL)) {
-            StatusLine statusLine = fromIssue(issue);
-            platformSection.lines.add(statusLine);
+            StatusLine statusLine = fromIssue(issue, -1);
+            platformStatusLines.add(statusLine);
         }
-        status.sections.put(Status.PLATFORM_ID, platformSection);
+        StatusSection platformSection = new StatusSection("Platform", platformStatusLines);
 
-        StatusSection quarkiverseSection = new StatusSection();
-        quarkiverseSection.name = "Quarkiverse";
+        Set<StatusLine> quarkiverseStatusLines = new TreeSet<>();
         for (Issue issue : gitHubService.findIssuesByLabel(QUARKIVERSE_ORG, QUARKIVERSE_REPOSITORY, QUARKIVERSE_LABEL)) {
-            StatusLine statusLine = fromIssue(issue);
-            quarkiverseSection.lines.add(statusLine);
+            StatusLine statusLine = fromIssue(issue, -1);
+            quarkiverseStatusLines.add(statusLine);
         }
-        status.sections.put(Status.QUARKIVERSE_ID, quarkiverseSection);
+        StatusSection quarkiverseSection = new StatusSection("Quarkiverse", quarkiverseStatusLines);
 
-        return status;
+        sections.put(Status.MAIN_ID, mainSection);
+        sections.put(Status.PLATFORM_ID, platformSection);
+        sections.put(Status.QUARKIVERSE_ID, quarkiverseSection);
+
+        return new Status(sections, LocalDateTime.now());
     }
 
-    private StatusLine fromIssue(Issue issue) {
-        StatusLine statusLine = new StatusLine();
-        statusLine.name = issue.title;
-        statusLine.url = issue.url;
-        statusLine.statusCode = determineStatusCode(issue);
-        statusLine.failureMessage = issue.getFailureMessage();
-        return statusLine;
+    private StatusLine fromIssue(Issue issue, int order) {
+        return new StatusLine(
+                issue.title(),
+                issue.url(),
+                issue.failureMessage(),
+                determineStatusCode(issue),
+                order,
+                issue.buildStatus()
+        );
     }
 
     private static StatusCode determineStatusCode(Issue issue) {
-        if (issue.updatedAt == null || ChronoUnit.DAYS.between(issue.updatedAt, LocalDateTime.now()) > 2) {
+        if (issue.updatedAt() == null || ChronoUnit.DAYS.between(issue.updatedAt(), LocalDateTime.now()) > 2) {
             return StatusCode.WARNING;
         }
 
