@@ -10,15 +10,15 @@ import io.quarkus.status.model.StatusLine.BuildStatus;
 
 @RegisterForReflection
 public record Issue(String id,
-                    int number,
-                    String title,
-                    String body,
-                    String url,
-                    String state,
-                    LocalDateTime closedAt,
-                    LocalDateTime updatedAt,
-                    BuildStatus buildStatus,
-                    List<Comment> lastComments) implements Comparable<Issue> {
+        int number,
+        String title,
+        String body,
+        String url,
+        String state,
+        LocalDateTime closedAt,
+        LocalDateTime updatedAt,
+        BuildStatus buildStatus,
+        List<Comment> lastComments) implements Comparable<Issue> {
 
     public boolean isOpen() {
         return "OPEN".equals(state);

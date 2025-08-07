@@ -110,8 +110,7 @@ public class StatusService {
                 issue.failureMessage(),
                 determineStatusCode(issue),
                 order,
-                issue.buildStatus()
-        );
+                issue.buildStatus());
     }
 
     private static StatusCode determineStatusCode(Issue issue) {

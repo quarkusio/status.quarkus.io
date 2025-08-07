@@ -1,13 +1,15 @@
 package io.quarkus.status;
 
-import io.quarkus.scheduler.Scheduled;
-import io.quarkus.status.github.GitHubService;
-import io.quarkus.status.model.Label;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.List;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import io.quarkus.scheduler.Scheduled;
+import io.quarkus.status.github.GitHubService;
+import io.quarkus.status.model.Label;
 
 @ApplicationScoped
 public class LabelsService {
