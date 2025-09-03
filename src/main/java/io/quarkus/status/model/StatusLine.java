@@ -1,6 +1,7 @@
 package io.quarkus.status.model;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -55,6 +56,6 @@ public record StatusLine(String name,
     }
 
     @RegisterForReflection
-    public record BuildState(Instant date, String quarkusSha, String projectSha) {
+    public record BuildState(ZonedDateTime date, String quarkusSha, String projectSha) {
     }
 }

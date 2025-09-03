@@ -52,10 +52,10 @@
                                         <tr>
                                             <th></th>
                                             {#if line.buildStatus.lastSuccess}
-                                            <th>Last success</th>
+                                            <th>Last success - {line.buildStatus.lastSuccess.date.format("yyyy-MM-dd")}</th>
                                             {/if}
                                             {#if line.buildStatus.firstFailure}
-                                            <th>First failure</th>
+                                            <th>First failure - {line.buildStatus.firstFailure.date.format("yyyy-MM-dd")}</th>
                                             {/if}
                                             {#if line.buildStatus.lastSuccess && line.buildStatus.firstFailure}
                                             <th>Diff</th>
