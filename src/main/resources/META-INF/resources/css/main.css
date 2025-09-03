@@ -35,6 +35,14 @@
 	font-size: 1em;
 }
 
+details > summary {
+	cursor: pointer;
+}
+
+details code {
+	font-size: 0.9rem;
+}
+
 .details-full-report {
   color: #666;
 }

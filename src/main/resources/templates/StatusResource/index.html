@@ -43,6 +43,71 @@
 								{line.failureMessage.message.raw}
 							{/if}
 							</div>
+                            {#if line.buildStatus}
+                            <div class="ui piled segment failure-message">
+                            <details>
+                                <summary>More information</summary>
+                                <table class="ui definition celled striped table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            {#if line.buildStatus.lastSuccess}
+                                            <th>Last success</th>
+                                            {/if}
+                                            {#if line.buildStatus.firstFailure}
+                                            <th>First failure</th>
+                                            {/if}
+                                            {#if line.buildStatus.lastSuccess && line.buildStatus.firstFailure}
+                                            <th>Diff</th>
+                                            {/if}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {#if line.buildStatus.quarkusSha}
+                                        <tr>
+                                            <td>Quarkus</td>
+                                            {#if line.buildStatus.lastSuccess}
+                                            <td class="left green marked"><a href="https://github.com/quarkusio/quarkus/tree/{line.buildStatus.lastSuccess.quarkusSha}"><code>{line.buildStatus.lastSuccess.quarkusSha}</code></a></td>
+                                            {/if}
+                                            {#if line.buildStatus.firstFailure}
+                                            <td class="left red marked"><a href="https://github.com/quarkusio/quarkus/tree/{line.buildStatus.firstFailure.quarkusSha}"><code>{line.buildStatus.firstFailure.quarkusSha}</code></a></td>
+                                            {/if}
+                                            {#if line.buildStatus.lastSuccess && line.buildStatus.firstFailure}
+                                            <td>
+                                                {#if line.buildStatus.lastSuccess.quarkusSha != line.buildStatus.firstFailure.quarkusSha}
+                                                <a href="https://github.com/quarkusio/quarkus/compare/{line.buildStatus.lastSuccess.quarkusSha}...{line.buildStatus.firstFailure.quarkusSha}">Compare</a>
+                                                {#else}
+                                                &nbsp;
+                                                {/if}
+                                            </td>
+                                            {/if}
+                                        </tr>
+                                        {/if}
+                                        {#if line.buildStatus.projectSha}
+                                        <tr>
+                                            <td>Project</td>
+                                            {#if line.buildStatus.lastSuccess}
+                                            <td class="left green marked"><a href="https://github.com/{line.buildStatus.repository}/tree/{line.buildStatus.lastSuccess.projectSha}"><code>{line.buildStatus.lastSuccess.projectSha}</code></a></td>
+                                            {/if}
+                                            {#if line.buildStatus.firstFailure}
+                                            <td class="left red marked"><a href="https://github.com/{line.buildStatus.repository}/tree/{line.buildStatus.firstFailure.projectSha}"><code>{line.buildStatus.firstFailure.projectSha}</code></a></td>
+                                            {/if}
+                                            {#if line.buildStatus.lastSuccess && line.buildStatus.firstFailure}
+                                            <td>
+                                                {#if line.buildStatus.lastSuccess.projectSha != line.buildStatus.firstFailure.projectSha}
+                                                <a href="https://github.com/{line.buildStatus.repository}/compare/{line.buildStatus.lastSuccess.projectSha}...{line.buildStatus.firstFailure.projectSha}">Compare</a>
+                                                {#else}
+                                                &nbsp;
+                                                {/if}
+                                            </td>
+                                            {/if}
+                                        </tr>
+                                        {/if}
+                                    </tbody>
+                                </table>
+                            </details>
+                            </div>
+                            {/if}
 							{/if}
 						</td>
 						<td class="center aligned">
