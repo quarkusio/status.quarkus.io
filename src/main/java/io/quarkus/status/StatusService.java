@@ -48,6 +48,13 @@ public class StatusService {
     private static final String QUARKIVERSE_REPOSITORY = "quarkiverse";
     private static final String QUARKIVERSE_LABEL = "triage/ci-quarkiverse";
 
+    private static final String QUARKUS_CXF = "quarkus-cxf";
+    private static final String CAMEL_QUARKUS_ORG = "apache";
+    private static final String CAMEL_QUARKUS_REPOSITORY = "camel-quarkus";
+
+    // CXF - quarkiverse/quarkus-cxf label: triage/ci-platform
+    // apache/camel-quarkus: triage/ci-platform
+
     @Inject
     GitHubService gitHubService;
 
@@ -87,6 +94,19 @@ public class StatusService {
             StatusLine statusLine = fromIssue(issue, -1);
             platformStatusLines.add(statusLine);
         }
+        for (Issue issue : gitHubService.findIssuesByLabel(QUARKUS_IO_ORG, MAIN_REPOSITORY, PLATFORM_LABEL)) {
+            StatusLine statusLine = fromIssue(issue, -1);
+            platformStatusLines.add(statusLine);
+        }
+        int order = 1;
+        for (Issue issue : gitHubService.findIssuesByLabel(QUARKIVERSE_ORG, QUARKUS_CXF, PLATFORM_LABEL)) {
+            StatusLine statusLine = fromIssue(issue, order++);
+            platformStatusLines.add(statusLine);
+        }
+        for (Issue issue : gitHubService.findIssuesByLabel(CAMEL_QUARKUS_ORG, CAMEL_QUARKUS_REPOSITORY, PLATFORM_LABEL)) {
+            StatusLine statusLine = fromIssue(issue, order++);
+            platformStatusLines.add(statusLine);
+        }
         StatusSection platformSection = new StatusSection("Platform", platformStatusLines);
 
         Set<StatusLine> quarkiverseStatusLines = new TreeSet<>();
@@ -120,4 +140,5 @@ public class StatusService {
 
         return issue.isOpen() ? StatusCode.FAILURE : StatusCode.SUCCESS;
     }
+
 }
